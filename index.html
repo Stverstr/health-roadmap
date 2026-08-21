@@ -398,7 +398,7 @@ input[type=checkbox]{width:16px;height:16px;accent-color:var(--g700);cursor:poin
         <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:12px;">
           <label style="display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--gy700);cursor:pointer;white-space:nowrap;">
             <input type="checkbox" id="mi-key" style="width:15px;height:15px;accent-color:var(--g700);cursor:pointer;flex-shrink:0;">
-            ⭐ Key activity
+            ⭐ To Discuss
           </label>
           <div style="display:flex;align-items:center;gap:6px;">
             <select class="select" id="mi-status" style="width:auto;padding-right:28px;">
@@ -642,7 +642,7 @@ function renderSbLegend() {
   }
   row2.push(`<div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center;">${lbl('Status')}${[['pending','○ Te doen','#374151','#F3F4F6'],['active','▶ Actief','#1E40AF','#DBEAFE'],['done','✓ Klaar','#14532D','#DCFCE7']].map(([val,l,fg,bg]) => chip(l, sbFilterStatuses.has(val), `sbToggleFilter('status','${val}')`, bg, fg)).join('')}</div>`);
   row2.push(`<div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center;">${lbl('Gezondheid')}${[['sunny','☀️','#92400E','#FEF3C7'],['partly_cloudy','⛅','#1E40AF','#DBEAFE'],['cloudy','☁️','#374151','#F3F4F6'],['stormy','⛈️','#991B1B','#FEE2E2']].map(([val,l,fg,bg]) => chip(l, sbFilterHealthStatuses.has(val), `sbToggleFilter('health','${val}')`, bg, fg)).join('')}</div>`);
-  row2.push(`<div style="display:flex;align-items:center;">${chip('⭐ Key', sbFilterKeyOnly, `sbToggleFilter('key')`, '#FEF9C3', '#713F12')}</div>`);
+  row2.push(`<div style="display:flex;align-items:center;">${chip('⭐ To discuss', sbFilterKeyOnly, `sbToggleFilter('key')`, '#FEF9C3', '#713F12')}</div>`);
   row2.push(`<div style="display:flex;align-items:center;">${chip('🔗 Andere roadmap', sbFilterOtherRoadmap, `sbToggleFilter('other')`, '#E5E7EB', '#374151')}</div>`);
   row2.push(`<div style="display:flex;align-items:center;">${chip('📥 Geen backlog', sbFilterNoBacklog, `sbToggleFilter('nobacklog')`, '#F0FDF4', '#14532D')}</div>`);
   if (anyActive) {
@@ -879,7 +879,7 @@ function renderStoryboard() {
           </div>
         </div>
         ${it.context_scope ? `<div style="font-size:11px;color:var(--gy500);line-height:1.4;margin-bottom:4px;">${esc(it.context_scope)}</div>` : ''}
-        <div style="display:flex;align-items:center;gap:5px;">${blStatusIcon[st]||blStatusIcon.pending}${it.key_activity?'<span style="font-size:11px;opacity:.55;" title="Key activity">⭐</span>':''}</div>
+        <div style="display:flex;align-items:center;gap:5px;">${blStatusIcon[st]||blStatusIcon.pending}${it.key_activity?'<span style="font-size:11px;opacity:.55;" title="To discuss">⭐</span>':''}</div>
       </div>`;
     });
 
@@ -933,7 +933,7 @@ function renderSbCell(cellItems, trackId, subcatId, phaseId, color) {
         </div>
       </div>
       ${it.context_scope ? `<div style="font-size:11px;color:var(--gy500);line-height:1.4;margin-bottom:4px;">${esc(it.context_scope)}</div>` : ''}
-      <div style="display:flex;align-items:center;gap:5px;">${statusIcon[st]||statusIcon.pending}${it.key_activity ? '<span style="font-size:11px;opacity:.55;" title="Key activity">⭐</span>' : ''}${isOther ? `<span style="font-size:10px;color:#6B7280;" title="${esc(it.other_roadmap_name||'Andere roadmap')}">🔗</span>` : ''}</div>
+      <div style="display:flex;align-items:center;gap:5px;">${statusIcon[st]||statusIcon.pending}${it.key_activity ? '<span style="font-size:11px;opacity:.55;" title="To discuss">⭐</span>' : ''}${isOther ? `<span style="font-size:10px;color:#6B7280;" title="${esc(it.other_roadmap_name||'Andere roadmap')}">🔗</span>` : ''}</div>
     </div>`;
   });
   const args = [trackId, subcatId, phaseId].map(x => x ? `'${x}'` : 'null').join(',');
