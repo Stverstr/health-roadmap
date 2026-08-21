@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CG Health Roadmap</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --g900:#1B4332;--g800:#2D6A4F;--g700:#40916C;--g600:#52B788;
+  --g400:#74C69D;--g300:#95D5B2;--g200:#B7E4C7;--g100:#D8F3DC;--g50:#F0FFF4;
+  --gy900:#111827;--gy800:#1F2937;--gy700:#374151;--gy600:#4B5563;--gy500:#6B7280;--gy400:#9CA3AF;
+  --gy300:#D1D5DB;--gy200:#E5E7EB;--gy100:#F3F4F6;--gy50:#F9FAFB;--white:#FFFFFF;
+  --blue:#3B82F6;--purple:#7C3AED;--orange:#F59E0B;--red:#EF4444;
+  --sturing:#1E40AF;--sturing-bg:#DBEAFE;--coord:#2D6A4F;--coord-bg:#D8F3DC;--warn:#B45309;--warn-bg:#FEF3C7;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#EFF3F1;color:var(--gy700);min-height:100vh;overflow-x:clip;}
+
+/* ── AUTH ── */
+#auth-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,var(--g900),var(--g700));}
+.auth-box{background:white;border-radius:16px;padding:40px;width:min(400px,94vw);box-shadow:0 20px 60px rgba(0,0,0,.3);}
+.auth-logo{font-size:28px;font-weight:800;color:var(--g800);margin-bottom:6px;}
+.auth-sub{font-size:13px;color:var(--gy500);margin-bottom:28px;}
+.auth-label{font-size:12px;font-weight:600;color:var(--gy700);display:block;margin-bottom:5px;}
+.auth-input{width:100%;border:1px solid var(--gy300);border-radius:8px;padding:9px 12px;font-size:14px;font-family:inherit;color:var(--gy900);margin-bottom:14px;}
+.auth-input:focus{outline:none;border-color:var(--g600);box-shadow:0 0 0 3px rgba(64,145,108,.15);}
+.auth-btn{width:100%;background:var(--g700);color:white;border:none;border-radius:8px;padding:11px;font-size:14px;font-weight:600;cursor:pointer;margin-top:4px;}
+.auth-btn:hover{background:var(--g800);}
+.auth-err{background:#FEE2E2;color:#991B1B;border-radius:7px;padding:9px 12px;font-size:13px;margin-bottom:12px;display:none;}
+
+/* ── HEADER ── */
+#app-screen{display:none;min-height:100vh;}
+.hdr{background:var(--g800);color:white;padding:0 24px;display:flex;align-items:center;height:54px;box-shadow:0 2px 8px rgba(0,0,0,.25);position:sticky;top:0;z-index:200;gap:12px;}
+.hdr-logo{font-size:16px;font-weight:800;display:flex;align-items:center;gap:8px;}
+.hdr-div{width:1px;height:24px;background:rgba(255,255,255,.25);}
+.hdr-proj{font-size:13px;opacity:.85;}
+.hdr-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.hdr-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:white;border-radius:7px;padding:5px 12px;font-size:12px;cursor:pointer;font-weight:500;text-decoration:none;}
+.hdr-btn:hover{background:rgba(255,255,255,.25);}
+
+/* ── NAV TABS ── */
+.nav{background:white;border-bottom:2px solid var(--gy300);display:flex;padding:0 16px;position:sticky;top:54px;z-index:100;}
+.ntab{padding:13px 18px;border:none;background:none;cursor:pointer;font-size:13px;font-weight:500;color:var(--gy500);border-bottom:3px solid transparent;white-space:nowrap;transition:all .18s;display:flex;align-items:center;gap:7px;margin-bottom:-2px;}
+.ntab:hover{color:var(--g700);}
+.ntab.active{color:var(--g800);border-bottom-color:var(--g700);font-weight:700;}
+
+/* ── MAIN ── */
+.main{padding:22px;max-width:1500px;margin:0 auto;}
+.panel{display:none;}.panel.active{display:block;}
+
+/* ── CARDS ── */
+.card{background:white;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.08);padding:20px 24px;margin-bottom:18px;}
+.card-title{font-size:15px;font-weight:700;color:var(--gy900);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+
+/* ── FORMS ── */
+.field{margin-bottom:14px;}
+.label{font-size:12px;font-weight:600;color:var(--gy700);display:block;margin-bottom:5px;}
+.input,.select,.textarea{width:100%;border:1px solid var(--gy300);border-radius:7px;padding:8px 11px;font-size:13px;font-family:inherit;color:var(--gy900);background:white;}
+.input:focus,.select:focus,.textarea:focus{outline:none;border-color:var(--g600);box-shadow:0 0 0 3px rgba(64,145,108,.12);}
+.input-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+/* ── BUTTONS ── */
+.btn{padding:7px 14px;border:none;border-radius:7px;cursor:pointer;font-size:13px;font-weight:500;transition:all .18s;display:inline-flex;align-items:center;gap:6px;}
+.btn-p{background:var(--g700);color:white;}.btn-p:hover{background:var(--g800);}
+.btn-s{background:var(--gy100);color:var(--gy700);border:1px solid var(--gy300);}.btn-s:hover{background:var(--gy200);}
+.btn-sm{padding:4px 10px;font-size:12px;}
+.btn-danger{background:#FEE2E2;color:#991B1B;border:1px solid #FCA5A5;}.btn-danger:hover{background:#FECACA;}
+
+/* ── MODAL ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;display:none;align-items:flex-start;justify-content:center;padding-top:60px;overflow-y:auto;}
+.overlay.open{display:flex;}
+.modal{background:white;border-radius:12px;width:min(560px,96vw);max-height:86vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3);display:flex;flex-direction:column;}
+.modal-head{padding:16px 22px 14px;border-bottom:1px solid var(--gy200);display:flex;align-items:center;gap:10px;position:sticky;top:0;background:white;z-index:1;border-radius:12px 12px 0 0;}
+.modal-title{font-size:15px;font-weight:700;color:var(--gy900);flex:1;}
+.modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--gy500);padding:2px 8px;line-height:1;}
+.modal-body{padding:20px 22px;flex:1;}
+.modal-foot{padding:12px 22px;border-top:1px solid var(--gy200);display:flex;justify-content:flex-end;gap:10px;background:white;border-radius:0 0 12px 12px;}
+
+/* ── STORYBOARD ── */
+.sb-wrap{overflow-x:auto;width:100%;container-type:inline-size;}
+#sb-grid{width:100%;}
+.sb-inner-grid>*{min-width:0;overflow:hidden;}
+.sb-sc-card .sb-sc-copy{opacity:0;transition:opacity .15s;}
+.sb-sc-card:hover .sb-sc-copy{opacity:1;}
+.sb-sc-cell .sb-sc-add{opacity:0;transition:opacity .15s;}
+.sb-sc-cell:hover .sb-sc-add{opacity:1;}
+.status-pending{background:#FEF3C7;color:#92400E;}
+.status-active{background:#DBEAFE;color:#1E40AF;}
+.status-done{background:#DCFCE7;color:#14532D;}
+.health-btn{font-size:20px;width:44px;height:40px;border-radius:8px;border:2px solid var(--gy300);background:var(--gy100);cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;}
+
+/* ── GOVERNANCE ── */
+.gov-eyebrow{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--gy500);margin-bottom:6px;font-weight:700;}
+.gov-h1{font-size:clamp(1.5rem,3vw,2rem);font-weight:800;letter-spacing:-.02em;color:var(--gy900);line-height:1.2;}
+.gov-intro{color:var(--gy600);margin-top:10px;max-width:680px;font-size:14px;line-height:1.6;}
+.gov-intro strong{color:var(--gy900);}
+.gov-probleem{border-left:4px solid var(--orange);background:#FFFBEB;}
+.gov-probleem h2{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--warn);margin-bottom:6px;font-weight:800;}
+.gov-probleem p{color:var(--gy800);font-size:14px;line-height:1.6;}
+.gov-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+@media(max-width:760px){.gov-grid{grid-template-columns:1fr;}}
+.gov-card{display:flex;flex-direction:column;gap:16px;padding:22px 24px;}
+.gov-card.sturing{border-top:4px solid var(--sturing);}
+.gov-card.coord{border-top:4px solid var(--coord);}
+.gov-tag{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--gy500);font-weight:700;margin-bottom:4px;}
+.gov-card h2{font-size:20px;font-weight:800;}
+.gov-card.sturing h2{color:var(--sturing);}
+.gov-card.coord h2{color:var(--coord);}
+.gov-doel{font-size:14px;color:var(--gy800);line-height:1.55;}
+.gov-doel strong{color:var(--gy900);}
+.gov-blok h3{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--gy500);margin-bottom:6px;font-weight:700;}
+.gov-blok ul{list-style:none;}
+.gov-blok li{font-size:13.5px;padding:4px 0 4px 20px;position:relative;color:var(--gy800);}
+.gov-blok li::before{content:"";position:absolute;left:3px;top:11px;width:8px;height:8px;border-radius:50%;}
+.sturing .gov-blok li::before{background:var(--sturing);}
+.coord .gov-blok li::before{background:var(--coord);}
+.gov-blok ul.niet li{color:var(--gy500);text-decoration:line-through;text-decoration-color:var(--gy400);}
+.gov-blok ul.niet li::before{background:transparent;border:1.5px solid var(--gy400);width:7px;height:7px;}
+.gov-personen{display:flex;flex-wrap:wrap;gap:6px;}
+.gov-persoon{background:var(--gy50);border:1px solid var(--gy200);border-radius:999px;padding:5px 12px;font-size:13px;color:var(--gy800);font-weight:600;}
+.gov-persoon span{color:var(--gy500);font-size:11px;font-weight:500;}
+.gov-flow h2{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gy500);margin-bottom:14px;font-weight:800;}
+.gov-flowline{display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:13px;}
+.gov-flowstep{background:var(--gy50);border:1px solid var(--gy200);border-radius:10px;padding:10px 14px;color:var(--gy700);}
+.gov-flowstep b{display:block;font-size:12px;margin-bottom:2px;}
+.gov-flowstep.s b{color:var(--sturing);} .gov-flowstep.c b{color:var(--coord);}
+.gov-pijl{color:var(--gy500);font-size:13px;}
+.gov-foot{color:var(--gy400);font-size:12px;margin-top:4px;}
+
+/* ── EMPTY STATE ── */
+.empty{text-align:center;padding:40px 20px;color:var(--gy500);}
+.empty-icon{font-size:40px;margin-bottom:10px;}
+.empty-title{font-size:15px;font-weight:700;color:var(--gy700);margin-bottom:5px;}
+.empty-sub{font-size:13px;}
+
+/* ── TOAST ── */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--gy900);color:white;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:500;z-index:9999;opacity:0;transition:opacity .25s;pointer-events:none;white-space:nowrap;}
+#toast.show{opacity:1;}
+
+/* ── MISC ── */
+input[type=checkbox]{width:16px;height:16px;accent-color:var(--g700);cursor:pointer;flex-shrink:0;}
+.loading{text-align:center;padding:30px;color:var(--gy500);font-size:13px;}
+
+/* ── ITEM DETAIL TABS ── */
+.item-tabs{display:flex;border-bottom:2px solid var(--gy200);background:var(--gy50);padding:0 16px;gap:2px;flex-shrink:0;}
+.itab{padding:10px 16px;border:none;background:none;cursor:pointer;font-size:13px;font-weight:500;color:var(--gy500);border-bottom:3px solid transparent;transition:all .15s;margin-bottom:-2px;}
+.itab.active{color:var(--g800);border-bottom-color:var(--g700);font-weight:700;}
+.itab-panel{display:none;}
+.itab-panel.active{display:block;}
+</style>
+</head>
+<body>
+
+<!-- ═══ AUTH ═══ -->
+<div id="auth-screen">
+  <div class="auth-box">
+    <div class="auth-logo">🏥 CG Health Roadmap</div>
+    <div class="auth-sub">Storyboard & governance van de Health-activiteiten</div>
+    <div class="auth-err" id="auth-err"></div>
+    <div id="auth-login-form">
+      <label class="auth-label">Wachtwoord</label>
+      <input class="auth-input" id="auth-pass" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+      <button class="auth-btn" onclick="doLogin()">Aanmelden</button>
+    </div>
+    <div style="margin-top:16px;text-align:center;font-size:12px;"><a href="https://stverstr.github.io" style="color:var(--g700);text-decoration:none;font-weight:600;">← Portfolio</a></div>
+  </div>
+</div>
+
+<!-- ═══ APP ═══ -->
+<div id="app-screen">
+  <header class="hdr">
+    <div class="hdr-logo">🏥 CG Health Roadmap</div>
+    <div class="hdr-div"></div>
+    <span class="hdr-proj" id="hdr-proj">Health CG</span>
+    <div class="hdr-right">
+      <span id="hdr-user" style="font-size:12px;opacity:.7;"></span>
+      <button class="hdr-btn" onclick="doLogout()">↩ Afmelden</button>
+    </div>
+  </header>
+
+  <nav class="nav">
+    <button class="ntab active" id="nav-storyboard-btn" onclick="switchTab('storyboard')">📋 Storyboard</button>
+    <button class="ntab" id="nav-governance-btn" onclick="switchTab('governance')">🏛 Governance</button>
+  </nav>
+
+  <!-- ══ STORYBOARD TAB ══ -->
+  <div id="tab-storyboard" class="panel active main">
+    <div id="storyboard-content">
+      <div class="card" style="padding:14px 18px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;">
+        <span style="font-size:15px;font-weight:700;color:var(--gy900)">📋 Storyboard</span>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <button class="btn btn-s btn-sm" id="sb-legend-toggle" onclick="sbToggleLegend()" title="Legende tonen/verbergen">🔍 Legende</button>
+          <button class="btn btn-p btn-sm" onclick="openAddItem()">＋ Item toevoegen</button>
+        </div>
+      </div>
+      <div id="sb-legend" class="card" style="padding:12px 18px;margin-bottom:14px;display:none;flex-wrap:wrap;gap:16px;align-items:flex-start;"></div>
+      <div class="sb-wrap">
+        <div id="sb-grid"><div class="loading">Laden…</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ GOVERNANCE TAB ══ -->
+  <div id="tab-governance" class="panel main">
+    <div class="card">
+      <p class="gov-eyebrow">Colruyt Group · Health</p>
+      <h1 class="gov-h1">Governance van de Health-activiteiten</h1>
+      <p class="gov-intro">Binnen Health lopen veel initiatieven tegelijk, maar de <strong>sturing</strong> erop is beperkt: prioriteiten zijn niet altijd scherp en nieuwe initiatieven duiken op zonder duidelijk kader ("champions poppen op"). Twee vaste overlegmomenten brengen daar structuur in.</p>
+    </div>
+
+    <div class="card gov-probleem">
+      <h2>Waarom deze governance</h2>
+      <p>Grip krijgen op het geheel: alle initiatieven zichtbaar maken, bewust prioriteren, scope en ownership vastleggen — en de uitvoering strak opvolgen zonder dat alles door elkaar loopt.</p>
+    </div>
+
+    <div class="gov-grid">
+      <div class="card gov-card sturing">
+        <div>
+          <p class="gov-tag">Strategisch niveau</p>
+          <h2>Health Sturing</h2>
+        </div>
+        <p class="gov-doel">Vanuit de strategie één duidelijke <strong>roadmap</strong> managen.</p>
+        <div class="gov-blok">
+          <h3>Focus</h3>
+          <ul>
+            <li>Alle initiatieven helder in kaart brengen</li>
+            <li>Prioriteren vanuit de strategie</li>
+            <li>Scope vastleggen</li>
+            <li>Ownership toewijzen</li>
+          </ul>
+        </div>
+        <div class="gov-blok">
+          <h3>Uitdrukkelijk niet</h3>
+          <ul class="niet">
+            <li>Operationele discussies</li>
+            <li>Tactisch-inhoudelijke debatten</li>
+          </ul>
+        </div>
+        <div class="gov-blok">
+          <h3>Deelnemers</h3>
+          <div class="gov-personen">
+            <div class="gov-persoon">Lisa <span>· leadership</span></div>
+            <div class="gov-persoon">Gilles <span>· leadership</span></div>
+            <div class="gov-persoon">Kenneth <span>· enterprise architect</span></div>
+            <div class="gov-persoon">Stijn <span>· coördinatie</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card gov-card coord">
+        <div>
+          <p class="gov-tag">Opvolgingsniveau</p>
+          <h2>Health Coördinatie</h2>
+        </div>
+        <p class="gov-doel">De belangrijkste initiatieven <strong>managen en opvolgen</strong> met de kernstakeholders.</p>
+        <div class="gov-blok">
+          <h3>Focus</h3>
+          <ul>
+            <li>Status van de belangrijkste initiatieven</li>
+            <li>Major escalaties behandelen</li>
+            <li>Beslissingen nemen</li>
+            <li>Impediments oplossen</li>
+          </ul>
+        </div>
+        <div class="gov-blok">
+          <h3>Deelnemers</h3>
+          <div class="gov-personen">
+            <div class="gov-persoon">Lisa</div>
+            <div class="gov-persoon">Kenneth</div>
+            <div class="gov-persoon">Stijn</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card gov-flow">
+      <h2>Hoe de twee samenwerken</h2>
+      <div class="gov-flowline">
+        <div class="gov-flowstep s"><b>Health Sturing</b>Roadmap · prioriteit · scope · ownership</div>
+        <span class="gov-pijl">→ geeft richting aan →</span>
+        <div class="gov-flowstep c"><b>Health Coördinatie</b>Status · escalaties · beslissingen · impediments</div>
+        <span class="gov-pijl">← escaleert terug naar Sturing</span>
+      </div>
+    </div>
+    <p class="gov-foot">Health governance · Colruyt Group · opgesteld door Stijn</p>
+  </div>
+</div>
+
+<!-- ═══ ITEM MODAL ═══ -->
+<div class="overlay" id="modal-item">
+  <div class="modal" style="width:min(700px,96vw)">
+    <div class="modal-head"><span class="modal-title" id="mi-title">📝 Activiteit</span><button class="modal-close" onclick="closeModal('modal-item')">✕</button></div>
+    <div class="item-tabs">
+      <button class="itab active" id="itab-btn-general" onclick="switchItemTab('general')">📋 Algemeen</button>
+    </div>
+    <div class="modal-body" style="padding-top:16px;">
+      <div id="itab-general" class="itab-panel active">
+        <div class="field">
+          <label class="label" style="display:flex;justify-content:space-between;">Activiteit <span id="mi-name-count" style="font-weight:400;color:var(--gy500);">0/30</span></label>
+          <input class="input" id="mi-name" placeholder="Naam van de activiteit…" maxlength="30" oninput="document.getElementById('mi-name-count').textContent=this.value.length+'/30'">
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:12px;">
+          <label style="display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--gy700);cursor:pointer;white-space:nowrap;">
+            <input type="checkbox" id="mi-key" style="width:15px;height:15px;accent-color:var(--g700);cursor:pointer;flex-shrink:0;">
+            ⭐ Key activity
+          </label>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <select class="select" id="mi-status" style="width:auto;padding-right:28px;">
+              <option value="pending">○ Te doen</option>
+              <option value="active">▶ Actief</option>
+              <option value="done">✓ Klaar</option>
+            </select>
+          </div>
+          <div style="display:flex;gap:5px;" id="mi-health-picker">
+            <button type="button" class="health-btn" data-val="" onclick="setHealthStatus('')" title="Geen">—</button>
+            <button type="button" class="health-btn" data-val="sunny" onclick="setHealthStatus('sunny')">☀️</button>
+            <button type="button" class="health-btn" data-val="partly_cloudy" onclick="setHealthStatus('partly_cloudy')">⛅</button>
+            <button type="button" class="health-btn" data-val="cloudy" onclick="setHealthStatus('cloudy')">☁️</button>
+            <button type="button" class="health-btn" data-val="stormy" onclick="setHealthStatus('stormy')">⛈️</button>
+          </div>
+          <input type="hidden" id="mi-health" value="">
+        </div>
+        <div class="field"><label class="label" style="display:flex;justify-content:space-between;">Context / Scope <span id="mi-context-count" style="font-weight:400;color:var(--gy500);">0/30</span></label><input class="input" id="mi-context" placeholder="Korte situatieschets en afbakening…" maxlength="30" oninput="document.getElementById('mi-context-count').textContent=this.value.length+'/30'"></div>
+        <div class="field">
+          <label class="label">Stream & Subcategorie</label>
+          <select class="select" id="mi-track-sub"><option value="">— Kies stream —</option></select>
+        </div>
+        <div class="field"><label class="label">Fase</label><select class="select" id="mi-phase"><option value="">— Geen fase —</option></select></div>
+        <div class="input-row">
+          <div class="field"><label class="label">Startmaand</label>
+            <div style="display:flex;gap:6px;">
+              <select class="select" id="mi-start-m" style="flex:1;"><option value="">Maand</option></select>
+              <select class="select" id="mi-start-y" style="width:88px;"><option value="">Jaar</option></select>
+            </div>
+          </div>
+          <div class="field"><label class="label">Eindmaand</label>
+            <div style="display:flex;gap:6px;">
+              <select class="select" id="mi-end-m" style="flex:1;"><option value="">Maand</option></select>
+              <select class="select" id="mi-end-y" style="width:88px;"><option value="">Jaar</option></select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-danger btn-sm" id="mi-del-btn" onclick="deleteItem()" style="margin-right:auto;display:none">🗑 Verwijder</button>
+      <button class="btn btn-s" onclick="closeModal('modal-item')">Annuleer</button>
+      <button class="btn btn-p" onclick="saveItem()">Opslaan</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════
+//  SUPABASE INIT — eigen database (project health-cg-werkoverleg), los van Roadmap Studio
+// ═══════════════════════════════════════════
+const SUPA_URL = 'https://mbcukzoutmypgewzujne.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1iY3Vrem91dG15cGdld3p1am5lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ3MTIwNjUsImV4cCI6MjEwMDI4ODA2NX0.db13Y5tAfsxDAs5MK9udIzxd87hwa4KPINDOplICbhc';
+const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
+const PROJECT_ID = '1973fc2b-3845-4967-ad11-c19130d82393'; // Health CG
+
+// ═══════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════
+let currentUser = null;
+let currentProjectId = PROJECT_ID;
+let tracks = [];
+let subcategories = [];
+let phases = [];
+let items = [];
+let editingItemId = null;
+
+// ═══════════════════════════════════════════
+//  AUTH — wachtwoordpoort (zelfde wachtwoord als de health-suite, hoofdletterongevoelig)
+// ═══════════════════════════════════════════
+const FIXED_USER = { id: '4bdbe724-042a-46bb-8a78-b1f8ffc82caf', email: 'stijn@stoover.be' };
+// Twee geldige wachtwoorden: het master-wachtwoord van de portfolio én het team-wachtwoord van de health-suite ("CG Health", hoofdletterongevoelig).
+const MASTER_HASH = '750db0f147fb55c6755f5b3bb2606a35623b43d03c80056c48587dfa2df45c04';
+const TEAM_HASH = 'ceb3fb22db509f33f1e1ecb12f5ebc54b4538344710d40ec550d8d918195f8fc';
+
+async function sha256(s) {
+  const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+  return Array.from(new Uint8Array(b)).map(x => x.toString(16).padStart(2,'0')).join('');
+}
+
+(async () => {
+  if (sessionStorage.getItem('hr_auth') === '1') {
+    currentUser = FIXED_USER;
+    showApp();
+  }
+})();
+
+function showApp() {
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('app-screen').style.display = 'block';
+  document.getElementById('hdr-user').textContent = currentUser.email;
+  loadData();
+}
+function showAuth() {
+  document.getElementById('auth-screen').style.display = 'flex';
+  document.getElementById('app-screen').style.display = 'none';
+}
+async function doLogin() {
+  const pass = document.getElementById('auth-pass').value;
+  const [hRaw, hTeam] = await Promise.all([sha256(pass), sha256(pass.trim().toLowerCase())]);
+  if (hRaw === MASTER_HASH || hTeam === TEAM_HASH) {
+    sessionStorage.setItem('hr_auth', '1');
+    currentUser = FIXED_USER;
+    showApp();
+  } else {
+    const i = document.getElementById('auth-pass');
+    i.style.borderColor = '#ef4444';
+    i.value = '';
+    setTimeout(() => i.style.borderColor = '', 600);
+    showAuthErr('Ongeldig wachtwoord');
+  }
+}
+function doLogout() {
+  sessionStorage.removeItem('hr_auth');
+  currentUser = null;
+  showAuth();
+}
+function showAuthErr(msg, c='#991B1B', bg='#FEE2E2') {
+  const el = document.getElementById('auth-err');
+  el.textContent = msg; el.style.display = 'block';
+  el.style.background = bg; el.style.color = c;
+}
+
+// ═══════════════════════════════════════════
+//  DATA
+// ═══════════════════════════════════════════
+async function loadData() {
+  const pid = currentProjectId;
+  const [pr, t, s, ph, it] = await Promise.all([
+    sb.from('projects').select('*').eq('id', pid).maybeSingle(),
+    sb.from('tracks').select('*').eq('project_id', pid).order('position'),
+    sb.from('subcategories').select('*').eq('project_id', pid).order('position'),
+    sb.from('phases').select('*').eq('project_id', pid).order('position'),
+    sb.from('roadmap_items').select('*').eq('project_id', pid).order('position'),
+  ]);
+  if (pr.data) document.getElementById('hdr-proj').textContent = pr.data.name;
+  tracks = t.data || [];
+  subcategories = s.data || [];
+  phases = ph.data || [];
+  items = it.data || [];
+  const err = [t, s, ph, it].find(r => r.error);
+  if (err) { toast('⚠️ Laden mislukt: ' + err.error.message); }
+  renderStoryboard();
+}
+
+// ═══════════════════════════════════════════
+//  TABS
+// ═══════════════════════════════════════════
+function switchTab(name) {
+  ['storyboard','governance'].forEach(t => {
+    const el = document.getElementById(`tab-${t}`); if (el) el.classList.toggle('active', t === name);
+    const btn = document.getElementById(`nav-${t}-btn`); if (btn) btn.classList.toggle('active', t === name);
+  });
+  if (name === 'storyboard') renderStoryboard();
+}
+
+// ═══════════════════════════════════════════
+//  STORYBOARD — filters & legende
+// ═══════════════════════════════════════════
+let sbFilterTracks  = new Set();
+let sbFilterSubcats = new Set();
+let sbFilterPhases  = new Set();
+let sbFilterStatuses = new Set();
+let sbFilterHealthStatuses = new Set();
+let sbFilterKeyOnly = false;
+let sbFilterOtherRoadmap = false;
+let sbFilterNoBacklog = false;
+let sbLegendOpen = false;
+
+function sbItemVisible(it) {
+  if (sbFilterKeyOnly && !it.key_activity) return false;
+  if (sbFilterOtherRoadmap && !it.managed_in_other_roadmap) return false;
+  if (sbFilterNoBacklog && !it.start_date) return false;
+  if (sbFilterStatuses.size && !sbFilterStatuses.has(it.status || 'pending')) return false;
+  if (sbFilterHealthStatuses.size && !sbFilterHealthStatuses.has(it.health_status || '')) return false;
+  return true;
+}
+
+function sbToggleFilter(type, value) {
+  const map = {track: sbFilterTracks, subcat: sbFilterSubcats, phase: sbFilterPhases, status: sbFilterStatuses, health: sbFilterHealthStatuses};
+  if (type === 'key') { sbFilterKeyOnly = !sbFilterKeyOnly; }
+  else if (type === 'other') { sbFilterOtherRoadmap = !sbFilterOtherRoadmap; }
+  else if (type === 'nobacklog') { sbFilterNoBacklog = !sbFilterNoBacklog; }
+  else { const s = map[type]; s.has(value) ? s.delete(value) : s.add(value); }
+  renderSbLegend();
+  renderStoryboard();
+}
+
+function sbToggleLegend() {
+  sbLegendOpen = !sbLegendOpen;
+  const el = document.getElementById('sb-legend');
+  const btn = document.getElementById('sb-legend-toggle');
+  if (el) el.style.display = sbLegendOpen ? 'block' : 'none';
+  if (btn) btn.style.background = sbLegendOpen ? 'var(--g100)' : '';
+  if (sbLegendOpen) renderSbLegend();
+}
+
+function sbClearFilters() {
+  sbFilterTracks.clear(); sbFilterSubcats.clear(); sbFilterPhases.clear();
+  sbFilterStatuses.clear(); sbFilterHealthStatuses.clear(); sbFilterKeyOnly = false; sbFilterOtherRoadmap = false; sbFilterNoBacklog = false;
+  renderSbLegend(); renderStoryboard();
+}
+
+function renderSbLegend() {
+  const el = document.getElementById('sb-legend');
+  if (!el || !sbLegendOpen) return;
+  const anyActive = sbFilterTracks.size || sbFilterSubcats.size || sbFilterPhases.size || sbFilterStatuses.size || sbFilterHealthStatuses.size || sbFilterKeyOnly || sbFilterOtherRoadmap || sbFilterNoBacklog;
+
+  const chip = (label, active, onclick, bg, fg) => {
+    const border = active ? `2px solid ${bg||'var(--g700)'}` : '2px solid transparent';
+    const bgStyle = active ? (bg ? bg + '33' : 'var(--g50)') : 'var(--gy100)';
+    return `<span onclick="${onclick}" style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:${border};background:${bgStyle};color:${fg||'var(--gy700)'};transition:all .15s;user-select:none;">${label}</span>`;
+  };
+  const lbl = (text, color) => `<span style="font-size:10px;font-weight:700;color:${color||'var(--gy500)'};text-transform:uppercase;letter-spacing:.6px;white-space:nowrap;margin-right:2px;">${text}</span>`;
+  const vdiv = `<div style="width:1px;min-height:24px;background:var(--gy200);flex-shrink:0;align-self:stretch;margin:0 2px;"></div>`;
+
+  // Rij 1: Streams | Categorieën
+  const row1 = [];
+  if (tracks.length) {
+    row1.push(`<div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center;">${lbl('Streams')}${tracks.map(tr => chip(
+      `<span style="width:8px;height:8px;border-radius:50%;background:${tr.color};flex-shrink:0;display:inline-block;"></span>${tr.icon?tr.icon+' ':''}${tr.name}`,
+      sbFilterTracks.has(tr.id), `sbToggleFilter('track','${tr.id}')`, tr.color, '#111827'
+    )).join('')}</div>`);
+  }
+  if (subcategories.length) {
+    row1.push(`<div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center;">${lbl('Categorieën')}${subcategories.map(sc => chip(
+      `<span style="width:8px;height:8px;border-radius:50%;background:${sc.color};flex-shrink:0;display:inline-block;"></span>${sc.icon?sc.icon+' ':''}${sc.name}`,
+      sbFilterSubcats.has(sc.id), `sbToggleFilter('subcat','${sc.id}')`, sc.color, '#111827'
+    )).join('')}</div>`);
+  }
+
+  // Rij 2: Fasen | Status | Gezondheid | Key | Andere roadmap | Geen backlog | Wissen
+  const row2 = [];
+  if (phases.length) {
+    row2.push(`<div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center;">${lbl('Fasen')}${phases.map(ph => {
+      const bg = ph.color || '#2D6A4F';
+      return chip(`${ph.icon?ph.icon+' ':''}${ph.name}`, sbFilterPhases.has(ph.id), `sbToggleFilter('phase','${ph.id}')`, bg, textColor(bg)==='#ffffff'?bg:'#111827');
+    }).join('')}</div>`);
+  }
+  row2.push(`<div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center;">${lbl('Status')}${[['pending','○ Te doen','#374151','#F3F4F6'],['active','▶ Actief','#1E40AF','#DBEAFE'],['done','✓ Klaar','#14532D','#DCFCE7']].map(([val,l,fg,bg]) => chip(l, sbFilterStatuses.has(val), `sbToggleFilter('status','${val}')`, bg, fg)).join('')}</div>`);
+  row2.push(`<div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center;">${lbl('Gezondheid')}${[['sunny','☀️','#92400E','#FEF3C7'],['partly_cloudy','⛅','#1E40AF','#DBEAFE'],['cloudy','☁️','#374151','#F3F4F6'],['stormy','⛈️','#991B1B','#FEE2E2']].map(([val,l,fg,bg]) => chip(l, sbFilterHealthStatuses.has(val), `sbToggleFilter('health','${val}')`, bg, fg)).join('')}</div>`);
+  row2.push(`<div style="display:flex;align-items:center;">${chip('⭐ Key', sbFilterKeyOnly, `sbToggleFilter('key')`, '#FEF9C3', '#713F12')}</div>`);
+  row2.push(`<div style="display:flex;align-items:center;">${chip('🔗 Andere roadmap', sbFilterOtherRoadmap, `sbToggleFilter('other')`, '#E5E7EB', '#374151')}</div>`);
+  row2.push(`<div style="display:flex;align-items:center;">${chip('📥 Geen backlog', sbFilterNoBacklog, `sbToggleFilter('nobacklog')`, '#F0FDF4', '#14532D')}</div>`);
+  if (anyActive) {
+    row2.push(`<span onclick="sbClearFilters()" style="font-size:12px;color:#DC2626;cursor:pointer;font-weight:600;padding:4px 8px;border-radius:6px;background:#FEE2E2;white-space:nowrap;">✕ Wissen</span>`);
+  }
+
+  el.innerHTML = `<div style="display:flex;flex-direction:column;gap:0;width:100%;">
+    ${row1.length ? `<div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding-bottom:10px;">${row1.join(vdiv)}</div>` : ''}
+    <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;${row1.length?'border-top:1px solid var(--gy100);padding-top:10px;':''}">
+      ${row2.join(vdiv)}
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════
+//  DRAG & DROP (storyboard)
+// ═══════════════════════════════════════════
+let sbDragItemId = null;
+let sbDragging = false;
+
+function sbCardDragStart(e, itemId) {
+  sbDragItemId = itemId;
+  sbDragging = true;
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', itemId);
+  e.stopPropagation();
+  setTimeout(() => {
+    const el = document.querySelector(`[data-item-id="${itemId}"]`);
+    if (el) el.style.opacity = '0.35';
+  }, 0);
+}
+
+function sbCardDragEnd(e, itemId) {
+  const el = document.querySelector(`[data-item-id="${itemId}"]`);
+  if (el) { el.style.opacity = '1'; el.style.borderTop = '1px solid var(--gy200)'; el.style.marginTop = ''; }
+  setTimeout(() => { sbDragging = false; }, 50);
+}
+
+async function sbApplyDrop(itemId, trackId, subcatId, phaseId, insertIdx, dest) {
+  const dragged = items.find(x => x.id === itemId);
+  if (!dragged) return;
+  const newList = [...dest];
+  newList.splice(insertIdx, 0, dragged);
+  await Promise.all(newList.map((it, idx) => {
+    const upd = {position: idx};
+    if (it.id === itemId) { upd.track_id = trackId; upd.subcategory_id = subcatId; upd.phase_id = phaseId; }
+    Object.assign(it, upd);
+    return sb.from('roadmap_items').update(upd).eq('id', it.id);
+  }));
+  sbDragItemId = null;
+  renderStoryboard();
+  toast('Verplaatst ✓');
+}
+
+function sbCellDragOver(e, trackId, subcatId, phaseId) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  const cell = e.currentTarget;
+  cell.querySelectorAll('.sb-drop-line').forEach(el => el.remove());
+  const cards = [...cell.querySelectorAll('[data-item-id]')];
+  let insertBefore = null;
+  for (const card of cards) {
+    const rect = card.getBoundingClientRect();
+    if (e.clientY < rect.top + rect.height / 2) { insertBefore = card; break; }
+  }
+  const line = document.createElement('div');
+  line.className = 'sb-drop-line';
+  line.style.cssText = 'height:3px;background:var(--g700);border-radius:2px;margin:2px 0;pointer-events:none;';
+  const addBtn = cell.querySelector('button[draggable="false"]');
+  cell.insertBefore(line, insertBefore || addBtn);
+}
+
+function sbCellDragLeave(e) {
+  if (!e.currentTarget.contains(e.relatedTarget)) {
+    e.currentTarget.querySelectorAll('.sb-drop-line').forEach(el => el.remove());
+  }
+}
+
+function sbCellDrop(e, trackId, subcatId, phaseId) {
+  e.preventDefault();
+  if (!sbDragItemId) return;
+  const cell = e.currentTarget;
+  cell.querySelectorAll('.sb-drop-line').forEach(el => el.remove());
+  const tid = trackId || null; const sid = subcatId || null; const pid = phaseId || null;
+  const cards = [...cell.querySelectorAll('[data-item-id]')];
+  let insertBeforeId = null;
+  for (const card of cards) {
+    const rect = card.getBoundingClientRect();
+    if (e.clientY < rect.top + rect.height / 2) { insertBeforeId = card.dataset.itemId; break; }
+  }
+  const dest = items.filter(i => i.track_id === tid && i.subcategory_id === sid && i.phase_id === pid && i.id !== sbDragItemId)
+    .sort((a,b) => (a.position||0) - (b.position||0));
+  let insertIdx = dest.length;
+  if (insertBeforeId && insertBeforeId !== sbDragItemId) {
+    const idx = dest.findIndex(i => i.id === insertBeforeId);
+    if (idx >= 0) insertIdx = idx;
+  }
+  sbApplyDrop(sbDragItemId, tid, sid, pid, insertIdx, dest);
+}
+
+// ═══════════════════════════════════════════
+//  STORYBOARD — render (1-op-1 uit Roadmap Studio)
+// ═══════════════════════════════════════════
+function renderStoryboard() {
+  renderSbLegend();
+  const el = document.getElementById('sb-grid');
+
+  if (!tracks.length && !phases.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">📋</div><div class="empty-title">Geen streams of fasen</div><div class="empty-sub">Er zijn nog geen streams en fasen in de database.</div></div>';
+    return;
+  }
+
+  // Build full column list
+  let colDefs = [];
+  tracks.forEach(tr => {
+    const subs = subcategories.filter(s => s.track_id === tr.id);
+    if (subs.length === 0) { colDefs.push({ track: tr, sub: null }); }
+    else { subs.forEach(sub => colDefs.push({ track: tr, sub })); }
+  });
+
+  // Apply column filters (tracks hide entire columns, subcats hide sub-columns)
+  if (sbFilterTracks.size)  colDefs = colDefs.filter(c => sbFilterTracks.has(c.track.id));
+  if (sbFilterSubcats.size) colDefs = colDefs.filter(c => c.sub && sbFilterSubcats.has(c.sub.id));
+
+  if (!colDefs.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">📋</div><div class="empty-title">Geen zichtbare streams</div><div class="empty-sub">Pas je filters aan.</div></div>';
+    return;
+  }
+
+  // Apply row filters (phases)
+  let rowPhases = phases.length ? phases : [null];
+  if (sbFilterPhases.size) rowPhases = rowPhases.filter(ph => ph && sbFilterPhases.has(ph.id));
+  if (!rowPhases.length) rowPhases = [null];
+
+  const labelW = 140;
+  // Kolombreedte via container-query-eenheden (100cqw = breedte .sb-wrap):
+  // elke kolom max 1/7 van de zichtbare breedte, zodat er altijd minstens
+  // 7 kolommen naast de labelkolom passen. Schaalt live mee bij resize.
+  const colMin = `max(90px, (100cqw - ${labelW + 2}px) / 7)`;
+  const gridCols = `${labelW}px repeat(${colDefs.length}, minmax(${colMin}, 1fr))`;
+  let html = `<div class="sb-inner-grid" style="display:grid;grid-template-columns:${gridCols};width:100%;min-width:calc(${labelW + 2}px + ${colDefs.length} * ${colMin});border:1px solid var(--gy300);border-radius:10px;">`;
+
+  // Header row 1: corner + track headers (spanning visible subcols)
+  html += `<div style="grid-column:1;grid-row:1/span 2;position:sticky;left:0;z-index:4;background:var(--gy900);border-right:1px solid rgba(255,255,255,.1);border-bottom:1px solid rgba(255,255,255,.1);"></div>`;
+  let colIdx = 2;
+  tracks.forEach(tr => {
+    const trCols = colDefs.filter(c => c.track.id === tr.id);
+    if (!trCols.length) return;
+    html += `<div style="grid-column:${colIdx}/span ${trCols.length};grid-row:1;background:${tr.color};color:${textColor(tr.color)};padding:8px 12px;font-size:13px;font-weight:700;text-align:center;border-right:1px solid rgba(0,0,0,.1);border-bottom:1px solid rgba(0,0,0,.1);display:flex;align-items:center;justify-content:center;gap:5px;">
+      <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.4);flex-shrink:0;"></span>${renderIcon(tr.icon, tr.color)}${tr.name}
+    </div>`;
+    colIdx += trCols.length;
+  });
+
+  // Header row 2: subcat/track labels
+  colIdx = 2;
+  colDefs.forEach(c => {
+    const bg = c.sub ? c.sub.color : c.track.color;
+    const label = c.sub ? `${renderIcon(c.sub.icon, bg)}${c.sub.name}` : `${renderIcon(c.track.icon, bg)}${c.track.name}`;
+    html += `<div style="grid-column:${colIdx};grid-row:2;background:${bg};color:${textColor(bg)};padding:6px 10px;font-size:11px;font-weight:600;text-align:center;border-right:1px solid rgba(0,0,0,.1);border-bottom:1px solid var(--gy300);">${label}</div>`;
+    colIdx++;
+  });
+
+  // Phase rows
+  let rowNum = 3;
+  rowPhases.forEach(ph => {
+    const phBg = ph ? (ph.color || '#2D6A4F') : 'var(--g700)';
+    const phLabel = ph
+      ? `<div style="font-size:13px;font-weight:700;">${renderIcon(ph.icon, phBg)}${ph.name}</div><div style="font-size:10px;opacity:.75;margin-top:3px;">${ph.start_date||''}${ph.start_date&&ph.end_date?' – ':''}${ph.end_date||''}</div>`
+      : `<div style="font-size:13px;font-weight:700;">Alle items</div>`;
+    html += `<div style="grid-column:1;grid-row:${rowNum};position:sticky;left:0;z-index:3;background:${phBg};color:${textColor(phBg)};padding:10px 12px;border-right:1px solid rgba(0,0,0,.1);border-top:1px solid rgba(0,0,0,.08);">${phLabel}</div>`;
+    colIdx = 2;
+    colDefs.forEach(c => {
+      const cellItems = items.filter(i =>
+        i.track_id === c.track.id &&
+        (c.sub ? i.subcategory_id === c.sub.id : !i.subcategory_id) &&
+        (ph ? i.phase_id === ph.id : true)
+      ).sort((a,b) => (a.position||0) - (b.position||0));
+      const color = c.sub ? c.sub.color : c.track.color;
+      html += `<div style="grid-column:${colIdx};grid-row:${rowNum};">${renderSbCell(cellItems, c.track.id, c.sub?c.sub.id:null, ph?ph.id:null, color)}</div>`;
+      colIdx++;
+    });
+    rowNum++;
+  });
+
+  // Backlog row — items die in geen enkele cel passen. Spant alle kolommen als één zone.
+  const showingRealPhaseRows = rowPhases.some(ph => ph !== null);
+  if (phases.length && showingRealPhaseRows) {
+    const backlogItems = items.filter(i => {
+      const validPhase = i.phase_id && phases.some(p => p.id === i.phase_id);
+      const validTrack = i.track_id && tracks.some(t => t.id === i.track_id);
+      let validSub = false;
+      if (validTrack) {
+        const trackSubs = subcategories.filter(s => s.track_id === i.track_id);
+        validSub = trackSubs.length
+          ? trackSubs.some(s => s.id === i.subcategory_id)
+          : !i.subcategory_id;
+      }
+      return !(validPhase && validTrack && validSub);
+    }).sort((a,b) => (a.position||0) - (b.position||0));
+    const totalTrackCols = colDefs.length;
+    const blStatusIcon = {
+      pending: '<span style="font-size:11px;color:var(--gy500);font-weight:700;line-height:1;">○</span>',
+      active:  '<span style="font-size:11px;color:#1E40AF;font-weight:700;line-height:1;">▶</span>',
+      done:    '<span style="font-size:11px;color:#14532D;font-weight:700;line-height:1;">✓</span>'
+    };
+
+    html += `<div style="grid-column:1;grid-row:${rowNum};position:sticky;left:0;z-index:3;background:#F8FAFC;color:var(--gy600,#6B7280);padding:10px 12px;border-right:1px solid var(--gy300);border-top:2px dashed var(--gy300);display:flex;flex-direction:column;gap:4px;align-items:flex-start;">
+      <div style="font-size:12px;font-weight:700;color:var(--gy500);">📥 Backlog</div>
+      <div style="font-size:10px;opacity:.7;">Niet (volledig) toegewezen</div>
+    </div>`;
+
+    let blHtml = `<div style="grid-column:2/span ${totalTrackCols};grid-row:${rowNum};background:#F8FAFC;border-top:2px dashed var(--gy300);padding:8px;min-height:80px;"
+      ondragover="sbCellDragOver(event,'','','')"
+      ondragleave="sbCellDragLeave(event)"
+      ondrop="sbCellDrop(event,'','','')">
+      <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:flex-start;">`;
+
+    backlogItems.filter(it => sbItemVisible(it)).forEach(it => {
+      const st = it.status || 'pending';
+      const borderCol = {pending:'#9CA3AF',active:'#3B82F6',done:'#22C55E'}[st]||'#9CA3AF';
+      const blTitleDeco = st === 'done' ? 'text-decoration:line-through;color:var(--gy400);' : '';
+      const blTitleFW = st === 'active' ? 'font-weight:800;' : 'font-weight:700;';
+      blHtml += `<div draggable="true" data-item-id="${it.id}" class="sb-sc-card"
+        style="border-left:3px solid ${borderCol};border-radius:0 7px 7px 0;padding:7px 9px;cursor:grab;background:#fafafa;border:1px solid var(--gy200);border-left:3px solid ${borderCol};user-select:none;transition:opacity .15s;min-width:130px;max-width:220px;"
+        ondragstart="sbCardDragStart(event,'${it.id}')"
+        ondragend="sbCardDragEnd(event,'${it.id}')"
+        onclick="if(!sbDragging)openModal('modal-item','${it.id}','edit')">
+        <div style="display:flex;align-items:flex-start;gap:4px;margin-bottom:3px;">
+          <div style="font-size:12px;${blTitleFW}color:var(--gy900);line-height:1.3;flex:1;min-width:0;overflow-wrap:break-word;${blTitleDeco}">${esc(it.title)}</div>
+          <div style="display:flex;align-items:center;gap:2px;flex-shrink:0;margin-top:1px;">
+            ${it.health_status ? `<span style="font-size:14px;line-height:1;" title="${it.health_status}">${HEALTH_ICON[it.health_status]||''}</span>` : ''}
+            <button class="sb-sc-copy" onclick="event.stopPropagation();copyItem('${it.id}')" title="Kopiëren" draggable="false" style="background:none;border:none;cursor:pointer;font-size:12px;color:var(--gy400);padding:1px 2px;border-radius:3px;line-height:1;">⧉</button>
+          </div>
+        </div>
+        ${it.context_scope ? `<div style="font-size:11px;color:var(--gy500);line-height:1.4;margin-bottom:4px;">${esc(it.context_scope)}</div>` : ''}
+        <div style="display:flex;align-items:center;gap:5px;">${blStatusIcon[st]||blStatusIcon.pending}${it.key_activity?'<span style="font-size:11px;opacity:.55;" title="Key activity">⭐</span>':''}</div>
+      </div>`;
+    });
+
+    blHtml += `</div>
+      <button draggable="false" style="margin-top:6px;background:none;border:1px dashed transparent;color:var(--gy400);border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;font-weight:500;transition:all .15s;" onmouseover="this.style.borderColor='var(--gy300)';this.style.color='var(--gy600)';this.style.background='var(--gy50)'" onmouseout="this.style.borderColor='transparent';this.style.color='var(--gy400)';this.style.background='none'" onclick="openAddItemPrefill(null,null,null)">＋ Backlog item</button>
+    </div>`;
+    html += blHtml;
+  }
+
+  html += '</div>';
+  el.innerHTML = html;
+}
+
+// Herbereken kolombreedtes bij venster-resize
+let sbResizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(sbResizeTimer);
+  sbResizeTimer = setTimeout(() => {
+    if (document.getElementById('tab-storyboard').classList.contains('active') && (tracks.length || phases.length)) renderStoryboard();
+  }, 200);
+});
+
+function renderSbCell(cellItems, trackId, subcatId, phaseId, color) {
+  const statusIcon = {
+    pending: '<span style="font-size:11px;color:var(--gy500);font-weight:700;line-height:1;">○</span>',
+    active:  '<span style="font-size:11px;color:#1E40AF;font-weight:700;line-height:1;">▶</span>',
+    done:    '<span style="font-size:11px;color:#14532D;font-weight:700;line-height:1;">✓</span>'
+  };
+  const tid = trackId || ''; const sid = subcatId || ''; const pid = phaseId || '';
+  let html = `<div class="sb-sc-cell" style="background:white;border-right:1px solid var(--gy300);border-top:1px solid var(--gy200);padding:8px;min-height:100px;vertical-align:top;"
+    ondragover="sbCellDragOver(event,'${tid}','${sid}','${pid}')"
+    ondragleave="sbCellDragLeave(event)"
+    ondrop="sbCellDrop(event,'${tid}','${sid}','${pid}')">`;
+  cellItems.filter(it => sbItemVisible(it)).forEach(it => {
+    const st = it.status || 'pending';
+    const isOther = !!it.managed_in_other_roadmap;
+    const cardBg = isOther ? '#E5E7EB' : '#fafafa';
+    const leftBorderColor = isOther ? '#9CA3AF' : color;
+    const titleDeco = st === 'done' ? 'text-decoration:line-through;color:var(--gy400);' : '';
+    const titleFW = st === 'active' ? 'font-weight:800;' : 'font-weight:700;';
+    html += `<div draggable="true" data-item-id="${it.id}" class="sb-sc-card"
+      style="border-left:3px solid ${leftBorderColor};border-radius:0 7px 7px 0;padding:7px 9px;margin-bottom:6px;cursor:grab;background:${cardBg};border-top:1px solid var(--gy200);border-right:1px solid var(--gy200);border-bottom:1px solid var(--gy200);user-select:none;transition:opacity .15s;"
+      ondragstart="sbCardDragStart(event,'${it.id}')"
+      ondragend="sbCardDragEnd(event,'${it.id}')"
+      onclick="if(!sbDragging)openModal('modal-item','${it.id}','edit')">
+      <div style="display:flex;align-items:flex-start;gap:4px;margin-bottom:3px;">
+        <div style="font-size:12px;${titleFW}color:${isOther?'#374151':'var(--gy900)'};line-height:1.3;flex:1;min-width:0;overflow-wrap:break-word;${titleDeco}">${esc(it.title)}</div>
+        <div style="display:flex;align-items:center;gap:2px;flex-shrink:0;margin-top:1px;">
+          ${it.health_status ? `<span style="font-size:14px;line-height:1;" title="${it.health_status}">${HEALTH_ICON[it.health_status]||''}</span>` : ''}
+          <button class="sb-sc-copy" onclick="event.stopPropagation();copyItem('${it.id}')" title="Kopiëren" draggable="false" style="background:none;border:none;cursor:pointer;font-size:12px;color:var(--gy400);padding:1px 2px;border-radius:3px;line-height:1;">⧉</button>
+        </div>
+      </div>
+      ${it.context_scope ? `<div style="font-size:11px;color:var(--gy500);line-height:1.4;margin-bottom:4px;">${esc(it.context_scope)}</div>` : ''}
+      <div style="display:flex;align-items:center;gap:5px;">${statusIcon[st]||statusIcon.pending}${it.key_activity ? '<span style="font-size:11px;opacity:.55;" title="Key activity">⭐</span>' : ''}${isOther ? `<span style="font-size:10px;color:#6B7280;" title="${esc(it.other_roadmap_name||'Andere roadmap')}">🔗</span>` : ''}</div>
+    </div>`;
+  });
+  const args = [trackId, subcatId, phaseId].map(x => x ? `'${x}'` : 'null').join(',');
+  html += `<button draggable="false" class="sb-sc-add" style="width:100%;background:none;border:1px dashed var(--gy300);color:var(--gy500);border-radius:6px;padding:4px;font-size:11px;cursor:pointer;font-weight:500;" onclick="openAddItemPrefill(${args})">＋</button>`;
+  html += `</div>`;
+  return html;
+}
+
+function openAddItemPrefill(trackId, subcatId, phaseId) {
+  openItemModal(null, 'add', null, trackId, subcatId, phaseId);
+}
+function openAddItem(prefillTrackId, prefillPhaseId) {
+  openItemModal(null, 'new', null, prefillTrackId, null, prefillPhaseId);
+}
+
+// ═══════════════════════════════════════════
+//  ITEM MODAL
+// ═══════════════════════════════════════════
+const MONTHS_NL = ['Jan','Feb','Mrt','Apr','Mei','Jun','Jul','Aug','Sep','Okt','Nov','Dec'];
+
+function fillMonthYearSelects(startMonthId, startYearId, endMonthId, endYearId) {
+  const curY = new Date().getFullYear();
+  const years = [];
+  for (let y = curY - 2; y <= curY + 6; y++) years.push(y);
+  [startMonthId, endMonthId].forEach(id => {
+    const el = document.getElementById(id);
+    el.innerHTML = '<option value="">Maand</option>' + MONTHS_NL.map((m,i) => `<option value="${i+1}">${m}</option>`).join('');
+  });
+  [startYearId, endYearId].forEach(id => {
+    const el = document.getElementById(id);
+    el.innerHTML = '<option value="">Jaar</option>' + years.map(y => `<option value="${y}">${y}</option>`).join('');
+  });
+}
+function setMonthYear(monthId, yearId, dateStr) {
+  if (!dateStr) return;
+  const d = new Date(dateStr);
+  document.getElementById(monthId).value = d.getUTCMonth() + 1;
+  document.getElementById(yearId).value = d.getUTCFullYear();
+}
+function getDateFromMonthYear(monthId, yearId, isEnd) {
+  const m = document.getElementById(monthId).value;
+  const y = document.getElementById(yearId).value;
+  if (!m || !y) return null;
+  const mm = String(m).padStart(2,'0');
+  if (isEnd) {
+    const lastDay = new Date(Number(y), Number(m), 0).getDate();
+    return `${y}-${mm}-${String(lastDay).padStart(2,'0')}`;
+  }
+  return `${y}-${mm}-01`;
+}
+
+function fillTrackSubDropdown(selectedTrackId, selectedSubcatId, selectId) {
+  const sel = document.getElementById(selectId || 'mi-track-sub');
+  sel.innerHTML = '<option value="">— Kies stream —</option>';
+  tracks.forEach(tr => {
+    const subs = subcategories.filter(s => s.track_id === tr.id);
+    if (subs.length === 0) {
+      const o = document.createElement('option');
+      o.value = tr.id + '|';
+      o.textContent = (tr.icon ? tr.icon + ' ' : '') + tr.name;
+      sel.appendChild(o);
+    } else {
+      const grp = document.createElement('optgroup');
+      grp.label = (tr.icon ? tr.icon + ' ' : '') + tr.name;
+      subs.forEach(s => {
+        const o = document.createElement('option');
+        o.value = tr.id + '|' + s.id;
+        o.textContent = (s.icon ? s.icon + ' ' : '') + s.name;
+        grp.appendChild(o);
+      });
+      sel.appendChild(grp);
+    }
+  });
+  if (selectedTrackId) {
+    sel.value = selectedTrackId + '|' + (selectedSubcatId || '');
+  }
+}
+
+function openModal(modalId, recordId, mode, extra) {
+  if (modalId === 'modal-item') { openItemModal(recordId, mode, extra); return; }
+  document.getElementById(modalId).classList.add('open');
+}
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
+});
+
+function openItemModal(id, mode, extra, prefillTrackId, prefillSubcatId, prefillPhaseId) {
+  editingItemId = mode === 'edit' ? id : null;
+  document.getElementById('mi-title').textContent = mode === 'edit' ? '✏️ Activiteit bewerken' : '📝 Nieuwe activiteit';
+  document.getElementById('mi-del-btn').style.display = mode === 'edit' ? 'inline-flex' : 'none';
+  switchItemTab('general');
+
+  fillMonthYearSelects('mi-start-m','mi-start-y','mi-end-m','mi-end-y');
+
+  const psel = document.getElementById('mi-phase');
+  psel.innerHTML = '<option value="">— Geen fase —</option>';
+  phases.forEach(p => { const o = document.createElement('option'); o.value = p.id; o.textContent = (p.icon ? p.icon+' ' : '') + p.name; psel.appendChild(o); });
+
+  if (mode === 'edit' && editingItemId) {
+    const it = items.find(x => x.id === editingItemId);
+    document.getElementById('mi-name').value = it.title;
+    document.getElementById('mi-name-count').textContent = it.title.length + '/30';
+    document.getElementById('mi-context').value = it.context_scope || '';
+    document.getElementById('mi-context-count').textContent = (it.context_scope||'').length + '/30';
+    document.getElementById('mi-key').checked = !!it.key_activity;
+    psel.value = it.phase_id || '';
+    fillTrackSubDropdown(it.track_id, it.subcategory_id);
+    setMonthYear('mi-start-m','mi-start-y', it.start_date);
+    setMonthYear('mi-end-m','mi-end-y', it.end_date);
+    document.getElementById('mi-status').value = it.status || 'pending';
+    setHealthStatus(it.health_status || '');
+  } else {
+    document.getElementById('mi-name').value = '';
+    document.getElementById('mi-name-count').textContent = '0/30';
+    document.getElementById('mi-context').value = '';
+    document.getElementById('mi-context-count').textContent = '0/30';
+    document.getElementById('mi-key').checked = false;
+    document.getElementById('mi-status').value = 'pending';
+    setHealthStatus('');
+    psel.value = prefillPhaseId || '';
+    fillTrackSubDropdown(prefillTrackId, prefillSubcatId);
+  }
+  document.getElementById('modal-item').classList.add('open');
+}
+
+async function saveItem() {
+  const title = document.getElementById('mi-name').value.trim();
+  if (!title) { alert('Activiteit naam is verplicht'); return; }
+  const trackSubVal = document.getElementById('mi-track-sub').value;
+  const [track_id, subcategory_id] = trackSubVal ? trackSubVal.split('|') : ['', ''];
+  const newStatus = document.getElementById('mi-status').value;
+  const newHealth = document.getElementById('mi-health').value || null;
+  const prev = editingItemId ? (items.find(x => x.id === editingItemId) || {}) : {};
+  const data = {
+    title,
+    context_scope: document.getElementById('mi-context').value,
+    deliverables: prev.deliverables ?? null,
+    key_activity: document.getElementById('mi-key').checked,
+    track_id: track_id || null,
+    subcategory_id: subcategory_id || null,
+    phase_id: document.getElementById('mi-phase').value || null,
+    start_date: getDateFromMonthYear('mi-start-m','mi-start-y', false),
+    end_date: getDateFromMonthYear('mi-end-m','mi-end-y', true),
+    status: newStatus,
+    health_status: newHealth,
+    owner: prev.owner ?? null,
+    managed_in_other_roadmap: prev.managed_in_other_roadmap ?? false,
+    other_roadmap_name: prev.other_roadmap_name ?? null,
+    dependencies: prev.dependencies ?? [],
+    item_phases: prev.item_phases ?? [],
+    updated_at: new Date().toISOString()
+  };
+
+  if (editingItemId) {
+    const prevStatus = prev.status;
+    const prevHealth = prev.health_status || null;
+    const { error } = await sb.from('roadmap_items').update(data).eq('id', editingItemId);
+    if (error) { toast('⚠️ Opslaan mislukt: ' + error.message); return; }
+    const idx = items.findIndex(x => x.id === editingItemId);
+    if (idx !== -1) Object.assign(items[idx], data);
+    if (newStatus !== prevStatus || newHealth !== prevHealth) {
+      await sb.from('item_status_history').insert({
+        item_id: editingItemId, status: newStatus, health_status: newHealth,
+        description: null, user_id: currentUser.id
+      });
+    }
+  } else {
+    const cellItems = items.filter(i => i.track_id === data.track_id && i.subcategory_id === data.subcategory_id && i.phase_id === data.phase_id);
+    const {data: nd, error} = await sb.from('roadmap_items').insert({...data, project_id: currentProjectId, position: cellItems.length}).select().single();
+    if (error) { toast('⚠️ Opslaan mislukt: ' + error.message); return; }
+    if (nd) items.push(nd);
+  }
+  closeModal('modal-item');
+  renderStoryboard();
+  toast('Activiteit opgeslagen ✓');
+}
+
+async function deleteItem() {
+  if (!editingItemId || !confirm('Item verwijderen?')) return;
+  const { error } = await sb.from('roadmap_items').delete().eq('id', editingItemId);
+  if (error) { toast('⚠️ Verwijderen mislukt: ' + error.message); return; }
+  items = items.filter(x => x.id !== editingItemId);
+  closeModal('modal-item');
+  renderStoryboard();
+  toast('Verwijderd');
+}
+
+async function copyItem(itemId) {
+  const src = items.find(x => x.id === itemId);
+  if (!src) return;
+  const cellItems = items.filter(i => i.track_id === src.track_id && i.subcategory_id === src.subcategory_id && i.phase_id === src.phase_id);
+  const copy = {
+    project_id: currentProjectId,
+    title: src.title + ' (kopie)',
+    context_scope: src.context_scope || null,
+    deliverables: src.deliverables || null,
+    key_activity: src.key_activity || false,
+    track_id: src.track_id,
+    subcategory_id: src.subcategory_id,
+    phase_id: src.phase_id,
+    start_date: src.start_date || null,
+    end_date: src.end_date || null,
+    status: src.status || 'pending',
+    health_status: src.health_status || null,
+    position: cellItems.length
+  };
+  const {data: nd, error} = await sb.from('roadmap_items').insert(copy).select().single();
+  if (error) { toast('⚠️ Kopiëren mislukt: ' + error.message); return; }
+  if (nd) items.push(nd);
+  renderStoryboard();
+  toast('Gekopieerd ✓');
+}
+
+function switchItemTab(tab) {
+  ['general'].forEach(t => {
+    const panel = document.getElementById(`itab-${t}`);
+    const btn = document.getElementById(`itab-btn-${t}`);
+    if (panel) panel.classList.toggle('active', t === tab);
+    if (btn) btn.classList.toggle('active', t === tab);
+  });
+}
+
+// ═══════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════
+const HEALTH_ICON = { sunny: '☀️', partly_cloudy: '⛅', cloudy: '☁️', stormy: '⛈️' };
+
+function setHealthStatus(val) {
+  document.getElementById('mi-health').value = val;
+  document.querySelectorAll('.health-btn').forEach(btn => {
+    const active = btn.dataset.val === val;
+    btn.style.borderColor = active ? '#2D6A4F' : 'var(--gy300)';
+    btn.style.background  = active ? '#D8F3DC' : 'var(--gy100)';
+    btn.style.transform   = active ? 'scale(1.15)' : 'scale(1)';
+  });
+}
+
+function textColor(hex) {
+  if (!hex || !hex.startsWith('#')) return '#ffffff';
+  const c = hex.replace('#','');
+  const r = parseInt(c.substr(0,2),16);
+  const g = parseInt(c.substr(2,2),16);
+  const b = parseInt(c.substr(4,2),16);
+  return (0.299*r + 0.587*g + 0.114*b) / 255 > 0.5 ? '#111827' : '#ffffff';
+}
+function isTextIcon(s) { return !!s && /^[\x20-\x7E]+$/.test(s); }
+function renderIcon(icon, parentBg) {
+  if (!icon) return '';
+  if (isTextIcon(icon)) {
+    let badgeBg = 'var(--g800)', badgeFg = 'white';
+    if (parentBg && parentBg.startsWith('#')) {
+      const isDark = textColor(parentBg) === '#ffffff';
+      badgeBg = isDark ? 'rgba(255,255,255,0.28)' : 'rgba(0,0,0,0.14)';
+      badgeFg = isDark ? 'white' : '#111827';
+    }
+    return `<span style="font-size:9px;font-weight:800;background:${badgeBg};color:${badgeFg};padding:1px 5px;border-radius:4px;letter-spacing:-.3px;vertical-align:middle;display:inline-block;line-height:1.5;">${icon}</span> `;
+  }
+  return icon + ' ';
+}
+function esc(s) { return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>
