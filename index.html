@@ -58,6 +58,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .label{font-size:12px;font-weight:600;color:var(--gy700);display:block;margin-bottom:5px;}
 .input,.select,.textarea{width:100%;border:1px solid var(--gy300);border-radius:7px;padding:8px 11px;font-size:13px;font-family:inherit;color:var(--gy900);background:white;}
 .input:focus,.select:focus,.textarea:focus{outline:none;border-color:var(--g600);box-shadow:0 0 0 3px rgba(64,145,108,.12);}
+.textarea{resize:vertical;min-height:54px;line-height:1.45;}
 .input-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 
 /* ── BUTTONS ── */
@@ -89,6 +90,25 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .status-active{background:#DBEAFE;color:#1E40AF;}
 .status-done{background:#DCFCE7;color:#14532D;}
 .health-btn{font-size:20px;width:44px;height:40px;border-radius:8px;border:2px solid var(--gy300);background:var(--gy100);cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;}
+/* Snelbalk in de activiteit-modal */
+.mi-quick{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 22px;background:var(--gy50);border-bottom:1px solid var(--gy200);position:sticky;top:57px;z-index:1;}
+.mi-quick-key{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:var(--gy800);cursor:pointer;white-space:nowrap;padding:4px 8px;border-radius:6px;border:1px solid transparent;}
+.mi-quick-key:hover{background:var(--g50);border-color:var(--g200);}
+.mi-quick-key input{width:15px;height:15px;accent-color:var(--g700);cursor:pointer;flex-shrink:0;}
+.mi-quick-sep{width:1px;height:22px;background:var(--gy200);flex-shrink:0;}
+.mi-quick .select{width:auto;padding:4px 26px 4px 8px;font-size:12.5px;font-weight:600;height:30px;}
+.mi-quick-health{display:flex;gap:4px;}
+.mi-quick .health-btn{width:32px;height:30px;font-size:15px;border-radius:6px;}
+/* Inklapbaar detail in de activiteit-modal */
+.mi-more{border:1px solid var(--gy200);border-radius:8px;background:var(--gy50);margin-top:4px;}
+.mi-more summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:9px 12px;font-size:12.5px;user-select:none;}
+.mi-more summary::-webkit-details-marker{display:none;}
+.mi-more summary::before{content:"▸";color:var(--gy500);font-size:12px;transition:transform .15s;flex-shrink:0;}
+.mi-more[open] summary::before{transform:rotate(90deg);}
+.mi-more-title{font-weight:700;color:var(--gy700);white-space:nowrap;}
+.mi-more-hint{color:var(--gy500);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0;}
+.mi-more[open] .mi-more-hint{display:none;}
+.mi-more-body{padding:12px 12px 0;border-top:1px solid var(--gy200);background:white;border-radius:0 0 8px 8px;}
 
 /* ── GOVERNANCE ── */
 .gov-eyebrow{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--gy500);margin-bottom:6px;font-weight:700;}
@@ -386,8 +406,27 @@ input[type=checkbox]{width:16px;height:16px;accent-color:var(--g700);cursor:poin
 <div class="overlay" id="modal-item">
   <div class="modal" style="width:min(700px,96vw)">
     <div class="modal-head"><span class="modal-title" id="mi-title">📝 Activiteit</span><button class="modal-close" onclick="closeModal('modal-item')">✕</button></div>
-    <div class="item-tabs">
-      <button class="itab active" id="itab-btn-general" onclick="switchItemTab('general')">📋 Algemeen</button>
+    <!-- Snelbalk: in één oogopslag aanpassen zonder te scrollen -->
+    <div class="mi-quick">
+      <label class="mi-quick-key" title="Markeer om te bespreken">
+        <input type="checkbox" id="mi-key">
+        ⭐ To Discuss
+      </label>
+      <span class="mi-quick-sep"></span>
+      <select class="select" id="mi-status" title="Status">
+        <option value="pending">○ Te doen</option>
+        <option value="active">▶ Actief</option>
+        <option value="done">✓ Klaar</option>
+      </select>
+      <span class="mi-quick-sep"></span>
+      <div class="mi-quick-health" id="mi-health-picker" title="Gezondheid">
+        <button type="button" class="health-btn" data-val="" onclick="setHealthStatus('')" title="Geen">—</button>
+        <button type="button" class="health-btn" data-val="sunny" onclick="setHealthStatus('sunny')" title="Zonnig">☀️</button>
+        <button type="button" class="health-btn" data-val="partly_cloudy" onclick="setHealthStatus('partly_cloudy')" title="Halfbewolkt">⛅</button>
+        <button type="button" class="health-btn" data-val="cloudy" onclick="setHealthStatus('cloudy')" title="Bewolkt">☁️</button>
+        <button type="button" class="health-btn" data-val="stormy" onclick="setHealthStatus('stormy')" title="Storm">⛈️</button>
+      </div>
+      <input type="hidden" id="mi-health" value="">
     </div>
     <div class="modal-body" style="padding-top:16px;">
       <div id="itab-general" class="itab-panel active">
@@ -395,47 +434,31 @@ input[type=checkbox]{width:16px;height:16px;accent-color:var(--g700);cursor:poin
           <label class="label" style="display:flex;justify-content:space-between;">Activiteit <span id="mi-name-count" style="font-weight:400;color:var(--gy500);">0/30</span></label>
           <input class="input" id="mi-name" placeholder="Naam van de activiteit…" maxlength="30" oninput="document.getElementById('mi-name-count').textContent=this.value.length+'/30'">
         </div>
-        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:12px;">
-          <label style="display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--gy700);cursor:pointer;white-space:nowrap;">
-            <input type="checkbox" id="mi-key" style="width:15px;height:15px;accent-color:var(--g700);cursor:pointer;flex-shrink:0;">
-            ⭐ To Discuss
-          </label>
-          <div style="display:flex;align-items:center;gap:6px;">
-            <select class="select" id="mi-status" style="width:auto;padding-right:28px;">
-              <option value="pending">○ Te doen</option>
-              <option value="active">▶ Actief</option>
-              <option value="done">✓ Klaar</option>
-            </select>
-          </div>
-          <div style="display:flex;gap:5px;" id="mi-health-picker">
-            <button type="button" class="health-btn" data-val="" onclick="setHealthStatus('')" title="Geen">—</button>
-            <button type="button" class="health-btn" data-val="sunny" onclick="setHealthStatus('sunny')">☀️</button>
-            <button type="button" class="health-btn" data-val="partly_cloudy" onclick="setHealthStatus('partly_cloudy')">⛅</button>
-            <button type="button" class="health-btn" data-val="cloudy" onclick="setHealthStatus('cloudy')">☁️</button>
-            <button type="button" class="health-btn" data-val="stormy" onclick="setHealthStatus('stormy')">⛈️</button>
-          </div>
-          <input type="hidden" id="mi-health" value="">
-        </div>
-        <div class="field"><label class="label" style="display:flex;justify-content:space-between;">Context / Scope <span id="mi-context-count" style="font-weight:400;color:var(--gy500);">0/30</span></label><input class="input" id="mi-context" placeholder="Korte situatieschets en afbakening…" maxlength="30" oninput="document.getElementById('mi-context-count').textContent=this.value.length+'/30'"></div>
-        <div class="field">
-          <label class="label">Stream & Subcategorie</label>
-          <select class="select" id="mi-track-sub"><option value="">— Kies stream —</option></select>
-        </div>
-        <div class="field"><label class="label">Fase</label><select class="select" id="mi-phase"><option value="">— Geen fase —</option></select></div>
-        <div class="input-row">
-          <div class="field"><label class="label">Startmaand</label>
-            <div style="display:flex;gap:6px;">
-              <select class="select" id="mi-start-m" style="flex:1;"><option value="">Maand</option></select>
-              <select class="select" id="mi-start-y" style="width:88px;"><option value="">Jaar</option></select>
+        <div class="field"><label class="label" style="display:flex;justify-content:space-between;">Context / Scope <span id="mi-context-count" style="font-weight:400;color:var(--gy500);">0/150</span></label><textarea class="textarea" id="mi-context" rows="2" placeholder="Korte situatieschets en afbakening…" maxlength="150" oninput="document.getElementById('mi-context-count').textContent=this.value.length+'/150'"></textarea></div>
+        <details class="mi-more" id="mi-more" ontoggle="updateMiMoreHint()">
+          <summary><span class="mi-more-title">Meer detail</span><span class="mi-more-hint" id="mi-more-hint"></span></summary>
+          <div class="mi-more-body">
+            <div class="field">
+              <label class="label">Stream & Subcategorie</label>
+              <select class="select" id="mi-track-sub" onchange="updateMiMoreHint()"><option value="">— Kies stream —</option></select>
+            </div>
+            <div class="field"><label class="label">Fase</label><select class="select" id="mi-phase" onchange="updateMiMoreHint()"><option value="">— Geen fase —</option></select></div>
+            <div class="input-row">
+              <div class="field"><label class="label">Startmaand</label>
+                <div style="display:flex;gap:6px;">
+                  <select class="select" id="mi-start-m" style="flex:1;" onchange="updateMiMoreHint()"><option value="">Maand</option></select>
+                  <select class="select" id="mi-start-y" style="width:88px;" onchange="updateMiMoreHint()"><option value="">Jaar</option></select>
+                </div>
+              </div>
+              <div class="field"><label class="label">Eindmaand</label>
+                <div style="display:flex;gap:6px;">
+                  <select class="select" id="mi-end-m" style="flex:1;" onchange="updateMiMoreHint()"><option value="">Maand</option></select>
+                  <select class="select" id="mi-end-y" style="width:88px;" onchange="updateMiMoreHint()"><option value="">Jaar</option></select>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="field"><label class="label">Eindmaand</label>
-            <div style="display:flex;gap:6px;">
-              <select class="select" id="mi-end-m" style="flex:1;"><option value="">Maand</option></select>
-              <select class="select" id="mi-end-y" style="width:88px;"><option value="">Jaar</option></select>
-            </div>
-          </div>
-        </div>
+        </details>
       </div>
     </div>
     <div class="modal-foot">
@@ -1038,7 +1061,7 @@ function openItemModal(id, mode, extra, prefillTrackId, prefillSubcatId, prefill
     document.getElementById('mi-name').value = it.title;
     document.getElementById('mi-name-count').textContent = it.title.length + '/30';
     document.getElementById('mi-context').value = it.context_scope || '';
-    document.getElementById('mi-context-count').textContent = (it.context_scope||'').length + '/30';
+    document.getElementById('mi-context-count').textContent = (it.context_scope||'').length + '/150';
     document.getElementById('mi-key').checked = !!it.key_activity;
     psel.value = it.phase_id || '';
     fillTrackSubDropdown(it.track_id, it.subcategory_id);
@@ -1050,14 +1073,29 @@ function openItemModal(id, mode, extra, prefillTrackId, prefillSubcatId, prefill
     document.getElementById('mi-name').value = '';
     document.getElementById('mi-name-count').textContent = '0/30';
     document.getElementById('mi-context').value = '';
-    document.getElementById('mi-context-count').textContent = '0/30';
+    document.getElementById('mi-context-count').textContent = '0/150';
     document.getElementById('mi-key').checked = false;
     document.getElementById('mi-status').value = 'pending';
     setHealthStatus('');
     psel.value = prefillPhaseId || '';
     fillTrackSubDropdown(prefillTrackId, prefillSubcatId);
   }
+  // Detail ingeklapt bij bewerken of bij een voorgekozen cel; open als er nog geen stream is
+  document.getElementById('mi-more').open = !(mode === 'edit' || prefillTrackId);
+  updateMiMoreHint();
   document.getElementById('modal-item').classList.add('open');
+}
+
+function updateMiMoreHint() {
+  const el = document.getElementById('mi-more-hint'); if (!el) return;
+  const ts = document.getElementById('mi-track-sub');
+  const ph = document.getElementById('mi-phase');
+  const txt = sel => sel.selectedIndex > 0 ? sel.options[sel.selectedIndex].textContent : '';
+  const m1 = document.getElementById('mi-start-m').value, y1 = document.getElementById('mi-start-y').value;
+  const m2 = document.getElementById('mi-end-m').value,   y2 = document.getElementById('mi-end-y').value;
+  const per = (m1 && y1 ? MONTHS_NL[m1-1] + ' ' + y1 : '') + (m1 && y1 && m2 && y2 ? ' – ' : '') + (m2 && y2 ? MONTHS_NL[m2-1] + ' ' + y2 : '');
+  const parts = [txt(ts), txt(ph), per].filter(Boolean);
+  el.textContent = parts.length ? parts.join(' · ') : 'stream, fase en periode nog niet ingevuld';
 }
 
 async function saveItem() {
