@@ -113,6 +113,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .gov-tool p strong{color:var(--gy900);}
 .gov-tool .btn{flex-shrink:0;white-space:nowrap;}
 @media(max-width:760px){.gov-tool{flex-wrap:wrap;}}
+.gov-streams h2{font-size:16px;font-weight:800;color:var(--gy900);margin-bottom:14px;}
+.gov-streams-grid{display:grid;grid-template-columns:3fr 2fr;gap:14px;}
+@media(max-width:760px){.gov-streams-grid{grid-template-columns:1fr;}}
+.gov-stream{border-radius:10px;padding:14px 16px;border:1px solid var(--gy200);background:var(--gy50);}
+.gov-stream.sturen{border-color:#A7F3D0;background:#F0FDF4;}
+.gov-stream.opvolgen{border-color:#BFDBFE;background:#EFF6FF;}
+.gov-stream-head{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:6px;}
+.gov-dot{width:12px;height:12px;border-radius:50%;display:inline-block;flex-shrink:0;border:1px solid rgba(0,0,0,.12);}
+.gov-stream-name{font-size:13.5px;font-weight:700;color:var(--gy900);}
+.gov-plus{color:var(--gy400);font-weight:700;margin:0 4px;}
+.gov-stream-tag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:3px 9px;border-radius:999px;margin-bottom:8px;}
+.sturen .gov-stream-tag{background:#0dc572;color:#063d2a;}
+.opvolgen .gov-stream-tag{background:#0052f5;color:white;}
+.gov-stream p{font-size:13.5px;color:var(--gy800);line-height:1.6;}
+.gov-stream p strong{color:var(--gy900);}
 .gov-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
 @media(max-width:760px){.gov-grid{grid-template-columns:1fr;}}
 .gov-card{display:flex;flex-direction:column;gap:16px;padding:22px 24px;}
@@ -240,6 +255,28 @@ input[type=checkbox]{width:16px;height:16px;accent-color:var(--g700);cursor:poin
         <p>Beide overlegmomenten werken op <strong>één en hetzelfde Storyboard</strong>: alle Health-initiatieven per stream en per fase, met status, gezondheid en key-markering. <strong>Sturing</strong> legt er de prioriteit, scope en ownership vast; <strong>Coördinatie</strong> volgt er de status, escalaties en impediments op. Wat niet op het storyboard staat, bestaat niet.</p>
       </div>
       <button class="btn btn-p" onclick="switchTab('storyboard');window.scrollTo(0,0)">Open het Storyboard →</button>
+    </div>
+
+    <div class="card gov-streams">
+      <h2>Drie streams op het bord, twee manieren van werken</h2>
+      <div class="gov-streams-grid">
+        <div class="gov-stream sturen">
+          <div class="gov-stream-head">
+            <span class="gov-dot" style="background:#0dc572"></span><span class="gov-stream-name">Strategische werking</span>
+            <span class="gov-plus">+</span>
+            <span class="gov-dot" style="background:#807842"></span><span class="gov-stream-name">Tactische werking</span>
+          </div>
+          <div class="gov-stream-tag">Sturen</div>
+          <p>Wat we <strong>samen willen verwezenlijken, vanuit de groep, met de verschillende merken</strong>. Hier geven Sturing en Coördinatie richting: prioriteit, scope en ownership worden op groepsniveau vastgelegd en opgevolgd.</p>
+        </div>
+        <div class="gov-stream opvolgen">
+          <div class="gov-stream-head">
+            <span class="gov-dot" style="background:#0052f5"></span><span class="gov-stream-name">Operationele werking</span>
+          </div>
+          <div class="gov-stream-tag">Opvolgen, niet sturen</div>
+          <p>Aspecten die we <strong>wel opvolgen</strong> op het bord, maar waarvoor we <strong>volle ownership binnen de enseigne</strong> verwachten. De groep stuurt hier niet; ze kijkt mee en grijpt enkel in bij escalatie.</p>
+        </div>
+      </div>
     </div>
 
     <div class="gov-grid">
