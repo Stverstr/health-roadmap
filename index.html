@@ -90,8 +90,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .status-active{background:#DBEAFE;color:#1E40AF;}
 .status-done{background:#DCFCE7;color:#14532D;}
 .health-btn{font-size:20px;width:44px;height:40px;border-radius:8px;border:2px solid var(--gy300);background:var(--gy100);cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;}
+/* Bewerkbare titel in de kop van de activiteit-modal */
+.mi-title-wrap{flex:1;display:flex;align-items:center;gap:8px;min-width:0;}
+.mi-title-input{flex:1;min-width:0;border:1px solid transparent;border-radius:7px;padding:4px 8px;margin-left:-8px;font-size:17px;font-weight:700;color:var(--gy900);background:transparent;font-family:inherit;line-height:1.3;}
+.mi-title-input::placeholder{color:var(--gy400);font-weight:600;}
+.mi-title-input:hover{border-color:var(--gy200);background:var(--gy50);}
+.mi-title-input:focus{outline:none;border-color:var(--g600);background:white;box-shadow:0 0 0 3px rgba(64,145,108,.12);}
+.mi-name-count{font-size:11px;color:var(--gy400);white-space:nowrap;}
 /* Snelbalk in de activiteit-modal */
-.mi-quick{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 22px;background:var(--gy50);border-bottom:1px solid var(--gy200);position:sticky;top:57px;z-index:1;}
+.mi-quick{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 22px;background:var(--gy50);border-bottom:1px solid var(--gy200);position:sticky;top:63px;z-index:1;}
 .mi-quick-key{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:var(--gy800);cursor:pointer;white-space:nowrap;padding:4px 8px;border-radius:6px;border:1px solid transparent;}
 .mi-quick-key:hover{background:var(--g50);border-color:var(--g200);}
 .mi-quick-key input{width:15px;height:15px;accent-color:var(--g700);cursor:pointer;flex-shrink:0;}
@@ -168,19 +175,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .gov-mode-sub{font-size:12.5px;color:var(--gy500);margin-top:2px;}
 .gov-mode p{font-size:13.5px;color:var(--gy800);line-height:1.6;}
 .gov-mode p strong{color:var(--gy900);}
-.gov-balans{margin-top:auto;padding-top:10px;border-top:1px dashed var(--gy200);}
-.gov-balans-label{font-size:10.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--gy500);margin-bottom:6px;}
-.gov-balans-row{display:flex;align-items:center;gap:10px;}
-.gov-balans-end{font-size:11.5px;font-weight:700;color:var(--gy700);white-space:nowrap;width:56px;}
-.gov-balans-end:last-child{text-align:right;}
-.gov-balans-track{flex:1;height:10px;border-radius:999px;background:var(--gy200);position:relative;overflow:visible;}
-.gov-balans-fill{height:100%;border-radius:999px;}
-.groep .gov-balans-fill{background:linear-gradient(90deg,#0dc572,#807842);}
-.enseigne .gov-balans-fill{background:#0052f5;}
-.gov-balans-marker{position:absolute;top:50%;width:18px;height:18px;border-radius:50%;background:white;border:3px solid var(--gy700);transform:translate(-50%,-50%);box-shadow:0 1px 4px rgba(0,0,0,.2);}
-.groep .gov-balans-marker{border-color:#0b7a4a;}
-.enseigne .gov-balans-marker{border-color:#0052f5;}
-.gov-balans-note{font-size:11.5px;color:var(--gy500);margin-top:6px;font-style:italic;}
+
 .gov-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
 @media(max-width:760px){.gov-grid{grid-template-columns:1fr;}}
 .gov-card{display:flex;flex-direction:column;gap:16px;padding:22px 24px;}
@@ -327,15 +322,6 @@ input[type=checkbox]{width:16px;height:16px;accent-color:var(--g700);cursor:poin
             </div>
           </div>
           <p>Wat we <strong>samen willen verwezenlijken</strong>. De groep bepaalt mee: prioriteit, scope en ownership worden op groepsniveau vastgelegd en op het bord bewaakt.</p>
-          <div class="gov-balans">
-            <div class="gov-balans-label">Wie bepaalt?</div>
-            <div class="gov-balans-row">
-              <span class="gov-balans-end">Groep</span>
-              <div class="gov-balans-track"><div class="gov-balans-fill" style="width:78%"></div><div class="gov-balans-marker" style="left:78%"></div></div>
-              <span class="gov-balans-end">Enseigne</span>
-            </div>
-            <div class="gov-balans-note">groep en merken beslissen samen</div>
-          </div>
         </div>
         <div class="gov-mode enseigne">
           <div class="gov-mode-streams">
@@ -349,15 +335,6 @@ input[type=checkbox]{width:16px;height:16px;accent-color:var(--g700);cursor:poin
             </div>
           </div>
           <p>De groep <strong>kijkt mee</strong> op het bord, maar de enseigne draagt de volle ownership en beslist zelf. De groep komt enkel tussen bij escalatie.</p>
-          <div class="gov-balans">
-            <div class="gov-balans-label">Wie bepaalt?</div>
-            <div class="gov-balans-row">
-              <span class="gov-balans-end">Groep</span>
-              <div class="gov-balans-track"><div class="gov-balans-fill" style="width:14%"></div><div class="gov-balans-marker" style="left:14%"></div></div>
-              <span class="gov-balans-end">Enseigne</span>
-            </div>
-            <div class="gov-balans-note">enseigne beslist, groep kijkt mee</div>
-          </div>
         </div>
       </div>
     </div>
@@ -468,7 +445,13 @@ input[type=checkbox]{width:16px;height:16px;accent-color:var(--g700);cursor:poin
 <!-- ═══ ITEM MODAL ═══ -->
 <div class="overlay" id="modal-item">
   <div class="modal" style="width:min(700px,96vw)">
-    <div class="modal-head"><span class="modal-title" id="mi-title">📝 Activiteit</span><button class="modal-close" onclick="closeModal('modal-item')">✕</button></div>
+    <div class="modal-head">
+      <div class="mi-title-wrap">
+        <input class="mi-title-input" id="mi-name" placeholder="Naam van de activiteit…" maxlength="60" title="Klik om de titel te bewerken" oninput="document.getElementById('mi-name-count').textContent=this.value.length+'/60'">
+        <span class="mi-name-count" id="mi-name-count">0/60</span>
+      </div>
+      <button class="modal-close" onclick="closeModal('modal-item')">✕</button>
+    </div>
     <!-- Snelbalk: in één oogopslag aanpassen zonder te scrollen -->
     <div class="mi-quick">
       <label class="mi-quick-key" title="Markeer om te bespreken">
@@ -493,10 +476,6 @@ input[type=checkbox]{width:16px;height:16px;accent-color:var(--g700);cursor:poin
     </div>
     <div class="modal-body" style="padding-top:16px;">
       <div id="itab-general" class="itab-panel active">
-        <div class="field">
-          <label class="label" style="display:flex;justify-content:space-between;">Activiteit <span id="mi-name-count" style="font-weight:400;color:var(--gy500);">0/60</span></label>
-          <input class="input" id="mi-name" placeholder="Naam van de activiteit…" maxlength="60" oninput="document.getElementById('mi-name-count').textContent=this.value.length+'/60'">
-        </div>
         <div class="field"><label class="label" style="display:flex;justify-content:space-between;">Context / Scope <span id="mi-context-count" style="font-weight:400;color:var(--gy500);">0/150</span></label><textarea class="textarea" id="mi-context" rows="2" placeholder="Korte situatieschets en afbakening…" maxlength="150" oninput="document.getElementById('mi-context-count').textContent=this.value.length+'/150'"></textarea></div>
         <!-- Rollende opmerkingen -->
         <div class="mi-comments" id="mi-comments">
@@ -1126,7 +1105,6 @@ document.querySelectorAll('.overlay').forEach(o => {
 
 function openItemModal(id, mode, extra, prefillTrackId, prefillSubcatId, prefillPhaseId) {
   editingItemId = mode === 'edit' ? id : null;
-  document.getElementById('mi-title').textContent = mode === 'edit' ? '✏️ Activiteit bewerken' : '📝 Nieuwe activiteit';
   document.getElementById('mi-del-btn').style.display = mode === 'edit' ? 'inline-flex' : 'none';
   switchItemTab('general');
 
@@ -1170,6 +1148,7 @@ function openItemModal(id, mode, extra, prefillTrackId, prefillSubcatId, prefill
   document.getElementById('mi-comment-hint').style.display = editingItemId ? 'none' : 'block';
   renderComments();
   document.getElementById('modal-item').classList.add('open');
+  if (mode !== 'edit') setTimeout(() => document.getElementById('mi-name').focus(), 50);
 }
 
 // ── Rollende opmerkingen ──────────────────────────────────
