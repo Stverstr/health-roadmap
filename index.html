@@ -152,21 +152,35 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .gov-tool p strong{color:var(--gy900);}
 .gov-tool .btn{flex-shrink:0;white-space:nowrap;}
 @media(max-width:760px){.gov-tool{flex-wrap:wrap;}}
-.gov-streams h2{font-size:16px;font-weight:800;color:var(--gy900);margin-bottom:14px;}
-.gov-streams-grid{display:grid;grid-template-columns:3fr 2fr;gap:14px;}
+.gov-streams h2{font-size:16px;font-weight:800;color:var(--gy900);margin-bottom:6px;}
+.gov-streams-intro{font-size:13.5px;color:var(--gy600);margin-bottom:14px;}
+.gov-streams-intro strong{color:var(--gy900);}
+.gov-streams-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
 @media(max-width:760px){.gov-streams-grid{grid-template-columns:1fr;}}
-.gov-stream{border-radius:10px;padding:14px 16px;border:1px solid var(--gy200);background:var(--gy50);}
-.gov-stream.sturen{border-color:#A7F3D0;background:#F0FDF4;}
-.gov-stream.opvolgen{border-color:#BFDBFE;background:#EFF6FF;}
-.gov-stream-head{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:6px;}
-.gov-dot{width:12px;height:12px;border-radius:50%;display:inline-block;flex-shrink:0;border:1px solid rgba(0,0,0,.12);}
-.gov-stream-name{font-size:13.5px;font-weight:700;color:var(--gy900);}
-.gov-plus{color:var(--gy400);font-weight:700;margin:0 4px;}
-.gov-stream-tag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:3px 9px;border-radius:999px;margin-bottom:8px;}
-.sturen .gov-stream-tag{background:#0dc572;color:#063d2a;}
-.opvolgen .gov-stream-tag{background:#0052f5;color:white;}
-.gov-stream p{font-size:13.5px;color:var(--gy800);line-height:1.6;}
-.gov-stream p strong{color:var(--gy900);}
+.gov-mode{border-radius:12px;padding:16px 18px;border:1px solid var(--gy200);background:var(--gy50);display:flex;flex-direction:column;gap:10px;}
+.gov-mode.groep{border-color:#A7F3D0;background:linear-gradient(180deg,#F0FDF4,#fff);}
+.gov-mode.enseigne{border-color:#BFDBFE;background:linear-gradient(180deg,#EFF6FF,#fff);}
+.gov-mode-streams{display:flex;flex-wrap:wrap;gap:6px;}
+.gov-stream-block{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:6px;font-size:12px;font-weight:700;letter-spacing:.01em;box-shadow:inset 0 -2px 0 rgba(0,0,0,.12);}
+.gov-mode-head{display:flex;align-items:center;gap:12px;margin-top:2px;}
+.gov-mode-icon{font-size:34px;line-height:1;flex-shrink:0;}
+.gov-mode-title{font-size:18px;font-weight:800;color:var(--gy900);line-height:1.2;}
+.gov-mode-sub{font-size:12.5px;color:var(--gy500);margin-top:2px;}
+.gov-mode p{font-size:13.5px;color:var(--gy800);line-height:1.6;}
+.gov-mode p strong{color:var(--gy900);}
+.gov-balans{margin-top:auto;padding-top:10px;border-top:1px dashed var(--gy200);}
+.gov-balans-label{font-size:10.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--gy500);margin-bottom:6px;}
+.gov-balans-row{display:flex;align-items:center;gap:10px;}
+.gov-balans-end{font-size:11.5px;font-weight:700;color:var(--gy700);white-space:nowrap;width:56px;}
+.gov-balans-end:last-child{text-align:right;}
+.gov-balans-track{flex:1;height:10px;border-radius:999px;background:var(--gy200);position:relative;overflow:visible;}
+.gov-balans-fill{height:100%;border-radius:999px;}
+.groep .gov-balans-fill{background:linear-gradient(90deg,#0dc572,#807842);}
+.enseigne .gov-balans-fill{background:#0052f5;}
+.gov-balans-marker{position:absolute;top:50%;width:18px;height:18px;border-radius:50%;background:white;border:3px solid var(--gy700);transform:translate(-50%,-50%);box-shadow:0 1px 4px rgba(0,0,0,.2);}
+.groep .gov-balans-marker{border-color:#0b7a4a;}
+.enseigne .gov-balans-marker{border-color:#0052f5;}
+.gov-balans-note{font-size:11.5px;color:var(--gy500);margin-top:6px;font-style:italic;}
 .gov-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
 @media(max-width:760px){.gov-grid{grid-template-columns:1fr;}}
 .gov-card{display:flex;flex-direction:column;gap:16px;padding:22px 24px;}
@@ -298,22 +312,52 @@ input[type=checkbox]{width:16px;height:16px;accent-color:var(--g700);cursor:poin
 
     <div class="card gov-streams">
       <h2>Drie streams op het bord, twee manieren van werken</h2>
+      <p class="gov-streams-intro">Elke stream op het storyboard valt onder één van twee werkwijzen. Het verschil zit in <strong>wie bepaalt</strong>: de groep of de enseigne.</p>
       <div class="gov-streams-grid">
-        <div class="gov-stream sturen">
-          <div class="gov-stream-head">
-            <span class="gov-dot" style="background:#0dc572"></span><span class="gov-stream-name">Strategische werking</span>
-            <span class="gov-plus">+</span>
-            <span class="gov-dot" style="background:#807842"></span><span class="gov-stream-name">Tactische werking</span>
+        <div class="gov-mode groep">
+          <div class="gov-mode-streams">
+            <span class="gov-stream-block" style="background:#0dc572;color:#063d2a">🚀 Strategische werking</span>
+            <span class="gov-stream-block" style="background:#807842;color:#fff">🚦 Tactische werking</span>
           </div>
-          <div class="gov-stream-tag">Sturen</div>
-          <p>Wat we <strong>samen willen verwezenlijken, vanuit de groep, met de verschillende merken</strong>. Hier geven Sturing en Coördinatie richting: prioriteit, scope en ownership worden op groepsniveau vastgelegd en opgevolgd.</p>
+          <div class="gov-mode-head">
+            <span class="gov-mode-icon">🤝</span>
+            <div>
+              <div class="gov-mode-title">Samen realiseren</div>
+              <div class="gov-mode-sub">Vanuit de groep, met de verschillende merken</div>
+            </div>
+          </div>
+          <p>Wat we <strong>samen willen verwezenlijken</strong>. De groep bepaalt mee: prioriteit, scope en ownership worden op groepsniveau vastgelegd en op het bord bewaakt.</p>
+          <div class="gov-balans">
+            <div class="gov-balans-label">Wie bepaalt?</div>
+            <div class="gov-balans-row">
+              <span class="gov-balans-end">Groep</span>
+              <div class="gov-balans-track"><div class="gov-balans-fill" style="width:78%"></div><div class="gov-balans-marker" style="left:78%"></div></div>
+              <span class="gov-balans-end">Enseigne</span>
+            </div>
+            <div class="gov-balans-note">groep en merken beslissen samen</div>
+          </div>
         </div>
-        <div class="gov-stream opvolgen">
-          <div class="gov-stream-head">
-            <span class="gov-dot" style="background:#0052f5"></span><span class="gov-stream-name">Operationele werking</span>
+        <div class="gov-mode enseigne">
+          <div class="gov-mode-streams">
+            <span class="gov-stream-block" style="background:#0052f5;color:#fff">🚗 Operationele werking</span>
           </div>
-          <div class="gov-stream-tag">Opvolgen, niet sturen</div>
-          <p>Aspecten die we <strong>wel opvolgen</strong> op het bord, maar waarvoor we <strong>volle ownership binnen de enseigne</strong> verwachten. De groep stuurt hier niet; ze kijkt mee en grijpt enkel in bij escalatie.</p>
+          <div class="gov-mode-head">
+            <span class="gov-mode-icon">🏪</span>
+            <div>
+              <div class="gov-mode-title">Enseigne aan zet</div>
+              <div class="gov-mode-sub">Volle ownership binnen het merk</div>
+            </div>
+          </div>
+          <p>De groep <strong>kijkt mee</strong> op het bord, maar de enseigne draagt de volle ownership en beslist zelf. De groep komt enkel tussen bij escalatie.</p>
+          <div class="gov-balans">
+            <div class="gov-balans-label">Wie bepaalt?</div>
+            <div class="gov-balans-row">
+              <span class="gov-balans-end">Groep</span>
+              <div class="gov-balans-track"><div class="gov-balans-fill" style="width:14%"></div><div class="gov-balans-marker" style="left:14%"></div></div>
+              <span class="gov-balans-end">Enseigne</span>
+            </div>
+            <div class="gov-balans-note">enseigne beslist, groep kijkt mee</div>
+          </div>
         </div>
       </div>
     </div>
