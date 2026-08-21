@@ -450,8 +450,8 @@ input[type=checkbox]{width:16px;height:16px;accent-color:var(--g700);cursor:poin
     <div class="modal-body" style="padding-top:16px;">
       <div id="itab-general" class="itab-panel active">
         <div class="field">
-          <label class="label" style="display:flex;justify-content:space-between;">Activiteit <span id="mi-name-count" style="font-weight:400;color:var(--gy500);">0/30</span></label>
-          <input class="input" id="mi-name" placeholder="Naam van de activiteit…" maxlength="30" oninput="document.getElementById('mi-name-count').textContent=this.value.length+'/30'">
+          <label class="label" style="display:flex;justify-content:space-between;">Activiteit <span id="mi-name-count" style="font-weight:400;color:var(--gy500);">0/60</span></label>
+          <input class="input" id="mi-name" placeholder="Naam van de activiteit…" maxlength="60" oninput="document.getElementById('mi-name-count').textContent=this.value.length+'/60'">
         </div>
         <div class="field"><label class="label" style="display:flex;justify-content:space-between;">Context / Scope <span id="mi-context-count" style="font-weight:400;color:var(--gy500);">0/150</span></label><textarea class="textarea" id="mi-context" rows="2" placeholder="Korte situatieschets en afbakening…" maxlength="150" oninput="document.getElementById('mi-context-count').textContent=this.value.length+'/150'"></textarea></div>
         <!-- Rollende opmerkingen -->
@@ -1095,7 +1095,7 @@ function openItemModal(id, mode, extra, prefillTrackId, prefillSubcatId, prefill
   if (mode === 'edit' && editingItemId) {
     const it = items.find(x => x.id === editingItemId);
     document.getElementById('mi-name').value = it.title;
-    document.getElementById('mi-name-count').textContent = it.title.length + '/30';
+    document.getElementById('mi-name-count').textContent = it.title.length + '/60';
     document.getElementById('mi-context').value = it.context_scope || '';
     document.getElementById('mi-context-count').textContent = (it.context_scope||'').length + '/150';
     document.getElementById('mi-key').checked = !!it.key_activity;
@@ -1107,7 +1107,7 @@ function openItemModal(id, mode, extra, prefillTrackId, prefillSubcatId, prefill
     setHealthStatus(it.health_status || '');
   } else {
     document.getElementById('mi-name').value = '';
-    document.getElementById('mi-name-count').textContent = '0/30';
+    document.getElementById('mi-name-count').textContent = '0/60';
     document.getElementById('mi-context').value = '';
     document.getElementById('mi-context-count').textContent = '0/150';
     document.getElementById('mi-key').checked = false;
