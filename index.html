@@ -99,6 +99,25 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .mi-quick .select{width:auto;padding:4px 26px 4px 8px;font-size:12.5px;font-weight:600;height:30px;}
 .mi-quick-health{display:flex;gap:4px;}
 .mi-quick .health-btn{width:32px;height:30px;font-size:15px;border-radius:6px;}
+/* Rollende opmerkingen in de activiteit-modal */
+.mi-comments{margin:4px 0 14px;border:1px solid var(--gy200);border-radius:8px;padding:12px;background:white;}
+.mi-comments-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;}
+.mi-author{width:160px;padding:5px 9px;font-size:12px;}
+.mi-comment-new{display:flex;gap:8px;align-items:flex-end;}
+.mi-comment-new .textarea{flex:1;min-height:48px;}
+.mi-comment-hint{font-size:12px;color:var(--gy500);font-style:italic;padding:6px 0;}
+.mi-comment-list{margin-top:10px;max-height:260px;overflow-y:auto;display:flex;flex-direction:column;}
+.mi-comment{display:flex;gap:10px;padding:9px 4px;border-top:1px solid var(--gy100);position:relative;}
+.mi-comment:first-child{border-top:none;}
+.mi-comment-dot{width:8px;height:8px;border-radius:50%;background:var(--g600);flex-shrink:0;margin-top:6px;}
+.mi-comment-meta{font-size:11px;color:var(--gy500);margin-bottom:2px;}
+.mi-comment-meta b{color:var(--gy700);font-weight:700;}
+.mi-comment-body{font-size:13px;color:var(--gy800);line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere;}
+.mi-comment-del{position:absolute;right:2px;top:7px;background:none;border:none;color:var(--gy400);cursor:pointer;font-size:13px;opacity:0;transition:opacity .15s;padding:2px 6px;border-radius:4px;}
+.mi-comment:hover .mi-comment-del{opacity:1;}
+.mi-comment-del:hover{color:#991B1B;background:#FEE2E2;}
+.mi-comment-empty{font-size:12px;color:var(--gy400);font-style:italic;padding:8px 0 2px;}
+.sb-cc{font-size:10px;color:var(--gy500);display:inline-flex;align-items:center;gap:2px;}
 /* Inklapbaar detail in de activiteit-modal */
 .mi-more{border:1px solid var(--gy200);border-radius:8px;background:var(--gy50);margin-top:4px;}
 .mi-more summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:9px 12px;font-size:12.5px;user-select:none;}
@@ -435,6 +454,20 @@ input[type=checkbox]{width:16px;height:16px;accent-color:var(--g700);cursor:poin
           <input class="input" id="mi-name" placeholder="Naam van de activiteit…" maxlength="30" oninput="document.getElementById('mi-name-count').textContent=this.value.length+'/30'">
         </div>
         <div class="field"><label class="label" style="display:flex;justify-content:space-between;">Context / Scope <span id="mi-context-count" style="font-weight:400;color:var(--gy500);">0/150</span></label><textarea class="textarea" id="mi-context" rows="2" placeholder="Korte situatieschets en afbakening…" maxlength="150" oninput="document.getElementById('mi-context-count').textContent=this.value.length+'/150'"></textarea></div>
+        <!-- Rollende opmerkingen -->
+        <div class="mi-comments" id="mi-comments">
+          <div class="mi-comments-head">
+            <span class="label" style="margin:0;">💬 Opmerkingen <span id="mi-comments-count" style="font-weight:400;color:var(--gy500);"></span></span>
+            <input class="input mi-author" id="mi-author" placeholder="Jouw naam" maxlength="40" onchange="localStorage.setItem('redbox-naam', this.value.trim())">
+          </div>
+          <div class="mi-comment-new" id="mi-comment-new">
+            <textarea class="textarea" id="mi-comment-text" rows="2" placeholder="Nieuwe opmerking… (⌘/Ctrl + Enter om toe te voegen)" onkeydown="if((event.metaKey||event.ctrlKey)&&event.key==='Enter'){event.preventDefault();addComment();}"></textarea>
+            <button class="btn btn-p btn-sm" onclick="addComment()">Toevoegen</button>
+          </div>
+          <div class="mi-comment-hint" id="mi-comment-hint" style="display:none;">Sla de activiteit eerst op; daarna kan je opmerkingen toevoegen.</div>
+          <div class="mi-comment-list" id="mi-comment-list"></div>
+        </div>
+
         <details class="mi-more" id="mi-more" ontoggle="updateMiMoreHint()">
           <summary><span class="mi-more-title">Meer detail</span><span class="mi-more-hint" id="mi-more-hint"></span></summary>
           <div class="mi-more-body">
@@ -489,6 +522,7 @@ let tracks = [];
 let subcategories = [];
 let phases = [];
 let items = [];
+let comments = []; // rollende opmerkingen, alle items van het project
 let editingItemId = null;
 
 // ═══════════════════════════════════════════
@@ -552,18 +586,20 @@ function showAuthErr(msg, c='#991B1B', bg='#FEE2E2') {
 // ═══════════════════════════════════════════
 async function loadData() {
   const pid = currentProjectId;
-  const [pr, t, s, ph, it] = await Promise.all([
+  const [pr, t, s, ph, it, cm] = await Promise.all([
     sb.from('projects').select('*').eq('id', pid).maybeSingle(),
     sb.from('tracks').select('*').eq('project_id', pid).order('position'),
     sb.from('subcategories').select('*').eq('project_id', pid).order('position'),
     sb.from('phases').select('*').eq('project_id', pid).order('position'),
     sb.from('roadmap_items').select('*').eq('project_id', pid).order('position'),
+    sb.from('item_comments').select('*').eq('project_id', pid).order('created_at', { ascending: false }),
   ]);
   if (pr.data) document.getElementById('hdr-proj').textContent = pr.data.name;
   tracks = t.data || [];
   subcategories = s.data || [];
   phases = ph.data || [];
   items = it.data || [];
+  comments = cm.data || [];
   const err = [t, s, ph, it].find(r => r.error);
   if (err) { toast('⚠️ Laden mislukt: ' + err.error.message); }
   renderStoryboard();
@@ -902,7 +938,7 @@ function renderStoryboard() {
           </div>
         </div>
         ${it.context_scope ? `<div style="font-size:11px;color:var(--gy500);line-height:1.4;margin-bottom:4px;">${esc(it.context_scope)}</div>` : ''}
-        <div style="display:flex;align-items:center;gap:5px;">${blStatusIcon[st]||blStatusIcon.pending}${it.key_activity?'<span style="font-size:11px;opacity:.55;" title="To discuss">⭐</span>':''}</div>
+        <div style="display:flex;align-items:center;gap:5px;">${blStatusIcon[st]||blStatusIcon.pending}${it.key_activity?'<span style="font-size:11px;opacity:.55;" title="To discuss">⭐</span>':''}${ccBadge(it.id)}</div>
       </div>`;
     });
 
@@ -956,7 +992,7 @@ function renderSbCell(cellItems, trackId, subcatId, phaseId, color) {
         </div>
       </div>
       ${it.context_scope ? `<div style="font-size:11px;color:var(--gy500);line-height:1.4;margin-bottom:4px;">${esc(it.context_scope)}</div>` : ''}
-      <div style="display:flex;align-items:center;gap:5px;">${statusIcon[st]||statusIcon.pending}${it.key_activity ? '<span style="font-size:11px;opacity:.55;" title="To discuss">⭐</span>' : ''}${isOther ? `<span style="font-size:10px;color:#6B7280;" title="${esc(it.other_roadmap_name||'Andere roadmap')}">🔗</span>` : ''}</div>
+      <div style="display:flex;align-items:center;gap:5px;">${statusIcon[st]||statusIcon.pending}${it.key_activity ? '<span style="font-size:11px;opacity:.55;" title="To discuss">⭐</span>' : ''}${isOther ? `<span style="font-size:10px;color:#6B7280;" title="${esc(it.other_roadmap_name||'Andere roadmap')}">🔗</span>` : ''}${ccBadge(it.id)}</div>
     </div>`;
   });
   const args = [trackId, subcatId, phaseId].map(x => x ? `'${x}'` : 'null').join(',');
@@ -1083,7 +1119,68 @@ function openItemModal(id, mode, extra, prefillTrackId, prefillSubcatId, prefill
   // Detail ingeklapt bij bewerken of bij een voorgekozen cel; open als er nog geen stream is
   document.getElementById('mi-more').open = !(mode === 'edit' || prefillTrackId);
   updateMiMoreHint();
+  // Opmerkingen: enkel voor bestaande activiteiten
+  document.getElementById('mi-author').value = localStorage.getItem('redbox-naam') || '';
+  document.getElementById('mi-comment-text').value = '';
+  document.getElementById('mi-comment-new').style.display = editingItemId ? 'flex' : 'none';
+  document.getElementById('mi-comment-hint').style.display = editingItemId ? 'none' : 'block';
+  renderComments();
   document.getElementById('modal-item').classList.add('open');
+}
+
+// ── Rollende opmerkingen ──────────────────────────────────
+function itemComments(itemId) {
+  return comments.filter(c => c.item_id === itemId).sort((a,b) => b.created_at.localeCompare(a.created_at));
+}
+function fmtDateTime(iso) {
+  const d = new Date(iso);
+  return d.toLocaleDateString('nl-BE', {day:'2-digit', month:'short', year:'numeric'}) + ' · ' + d.toLocaleTimeString('nl-BE', {hour:'2-digit', minute:'2-digit'});
+}
+function renderComments() {
+  const list = document.getElementById('mi-comment-list');
+  const cnt = document.getElementById('mi-comments-count');
+  const rows = editingItemId ? itemComments(editingItemId) : [];
+  cnt.textContent = rows.length ? `(${rows.length})` : '';
+  if (!editingItemId) { list.innerHTML = ''; return; }
+  if (!rows.length) { list.innerHTML = '<div class="mi-comment-empty">Nog geen opmerkingen — de eerste komt bovenaan te staan.</div>'; return; }
+  list.innerHTML = rows.map(c => `
+    <div class="mi-comment">
+      <div class="mi-comment-dot"></div>
+      <div style="flex:1;min-width:0;">
+        <div class="mi-comment-meta">${fmtDateTime(c.created_at)}${c.author ? ` · <b>${esc(c.author)}</b>` : ''}</div>
+        <div class="mi-comment-body">${esc(c.body)}</div>
+      </div>
+      <button class="mi-comment-del" title="Opmerking verwijderen" onclick="deleteComment('${c.id}')">✕</button>
+    </div>`).join('');
+}
+async function addComment() {
+  if (!editingItemId) return;
+  const ta = document.getElementById('mi-comment-text');
+  const body = ta.value.trim();
+  if (!body) { ta.focus(); return; }
+  const author = document.getElementById('mi-author').value.trim() || null;
+  if (author) localStorage.setItem('redbox-naam', author);
+  const { data: nd, error } = await sb.from('item_comments')
+    .insert({ item_id: editingItemId, project_id: currentProjectId, author, body }).select().single();
+  if (error) { toast('⚠️ Opmerking niet bewaard: ' + error.message); return; }
+  comments.unshift(nd);
+  ta.value = '';
+  renderComments();
+  renderStoryboard();
+  toast('Opmerking toegevoegd ✓');
+  ta.focus();
+}
+async function deleteComment(id) {
+  if (!confirm('Deze opmerking verwijderen?')) return;
+  const { error } = await sb.from('item_comments').delete().eq('id', id);
+  if (error) { toast('⚠️ Verwijderen mislukt: ' + error.message); return; }
+  comments = comments.filter(c => c.id !== id);
+  renderComments();
+  renderStoryboard();
+}
+function ccBadge(itemId) {
+  const n = comments.filter(c => c.item_id === itemId).length;
+  return n ? `<span class="sb-cc" title="${n} opmerking${n === 1 ? '' : 'en'}">💬${n}</span>` : '';
 }
 
 function updateMiMoreHint() {
