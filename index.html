@@ -703,7 +703,7 @@ function renderSbLegend() {
   row2.push(`<div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center;">${lbl('Gezondheid')}${[['sunny','☀️','#92400E','#FEF3C7'],['partly_cloudy','⛅','#1E40AF','#DBEAFE'],['cloudy','☁️','#374151','#F3F4F6'],['stormy','⛈️','#991B1B','#FEE2E2']].map(([val,l,fg,bg]) => chip(l, sbFilterHealthStatuses.has(val), `sbToggleFilter('health','${val}')`, bg, fg)).join('')}</div>`);
   row2.push(`<div style="display:flex;align-items:center;">${chip('⭐ To discuss', sbFilterKeyOnly, `sbToggleFilter('key')`, '#FEF9C3', '#713F12')}</div>`);
   row2.push(`<div style="display:flex;align-items:center;">${chip('🔗 Andere roadmap', sbFilterOtherRoadmap, `sbToggleFilter('other')`, '#E5E7EB', '#374151')}</div>`);
-  row2.push(`<div style="display:flex;align-items:center;">${chip('📥 Geen backlog', sbFilterNoBacklog, `sbToggleFilter('nobacklog')`, '#F0FDF4', '#14532D')}</div>`);
+  row2.push(`<div style="display:flex;align-items:center;">${chip('📅 Enkel gepland', sbFilterNoBacklog, `sbToggleFilter('nobacklog')`, '#F0FDF4', '#14532D')}</div>`);
   if (anyActive) {
     row2.push(`<span onclick="sbClearFilters()" style="font-size:12px;color:#DC2626;cursor:pointer;font-weight:600;padding:4px 8px;border-radius:6px;background:#FEE2E2;white-space:nowrap;">✕ Wissen</span>`);
   }
@@ -887,7 +887,7 @@ function renderStoryboard() {
     rowNum++;
   });
 
-  // Backlog row — items die in geen enkele cel passen. Spant alle kolommen als één zone.
+  // Rij 'Andere impediments of agendapunten' (backlog) — items die in geen enkele cel passen. Spant alle kolommen als één zone.
   const showingRealPhaseRows = rowPhases.some(ph => ph !== null);
   if (phases.length && showingRealPhaseRows) {
     const backlogItems = items.filter(i => {
@@ -910,8 +910,8 @@ function renderStoryboard() {
     };
 
     html += `<div style="grid-column:1;grid-row:${rowNum};position:sticky;left:0;z-index:3;background:#F8FAFC;color:var(--gy600,#6B7280);padding:10px 12px;border-right:1px solid var(--gy300);border-top:2px dashed var(--gy300);display:flex;flex-direction:column;gap:4px;align-items:flex-start;">
-      <div style="font-size:12px;font-weight:700;color:var(--gy500);">📥 Backlog</div>
-      <div style="font-size:10px;opacity:.7;">Niet (volledig) toegewezen</div>
+      <div style="font-size:12px;font-weight:700;color:var(--gy600);">📥 Andere impediments of agendapunten</div>
+      <div style="font-size:10px;opacity:.7;">Niet aan een stream of fase gekoppeld</div>
     </div>`;
 
     let blHtml = `<div style="grid-column:2/span ${totalTrackCols};grid-row:${rowNum};background:#F8FAFC;border-top:2px dashed var(--gy300);padding:8px;min-height:80px;"
@@ -943,7 +943,7 @@ function renderStoryboard() {
     });
 
     blHtml += `</div>
-      <button draggable="false" style="margin-top:6px;background:none;border:1px dashed transparent;color:var(--gy400);border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;font-weight:500;transition:all .15s;" onmouseover="this.style.borderColor='var(--gy300)';this.style.color='var(--gy600)';this.style.background='var(--gy50)'" onmouseout="this.style.borderColor='transparent';this.style.color='var(--gy400)';this.style.background='none'" onclick="openAddItemPrefill(null,null,null)">＋ Backlog item</button>
+      <button draggable="false" style="margin-top:6px;background:none;border:1px dashed transparent;color:var(--gy400);border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;font-weight:500;transition:all .15s;" onmouseover="this.style.borderColor='var(--gy300)';this.style.color='var(--gy600)';this.style.background='var(--gy50)'" onmouseout="this.style.borderColor='transparent';this.style.color='var(--gy400)';this.style.background='none'" onclick="openAddItemPrefill(null,null,null)">＋ Agendapunt of impediment</button>
     </div>`;
     html += blHtml;
   }
